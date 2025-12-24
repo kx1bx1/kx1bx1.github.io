@@ -1,4 +1,6 @@
 name: Nightly health checks
+permissions:
+  contents: read
 
 on:
   schedule:
