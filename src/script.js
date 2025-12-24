@@ -193,7 +193,7 @@ const App = (() => {
               featured: !!manifest.featured,
               searchString: `${manifest.name} ${desc} ${manifest.author}`.toLowerCase(),
             };
-          } catch (e) {
+          } catch (_e) {
             return null;
           }
         })
@@ -201,7 +201,7 @@ const App = (() => {
 
       const valid = loaded.filter((e) => e !== null);
       extensions = valid.length > 0 ? valid : hydrateMockData(mockExtensions);
-    } catch (e) {
+    } catch (_e) {
       extensions = hydrateMockData(mockExtensions);
     }
   }
@@ -556,7 +556,7 @@ const App = (() => {
     lastFocusedElement = document.activeElement;
     try {
       history.pushState(null, null, `#${id}`);
-    } catch (e) {
+    } catch (_e) {
       // History API may not be available in some environments
     }
 
@@ -606,7 +606,7 @@ const App = (() => {
         document.body.removeChild(a);
         URL.revokeObjectURL(blobUrl);
         showToast('Download started');
-      } catch (err) {
+      } catch (_err) {
         window.open(ext.url, '_blank');
         showToast('Opening file directly...', true);
       }
@@ -630,7 +630,7 @@ const App = (() => {
   function closeModal() {
     try {
       history.pushState(null, null, window.location.pathname + window.location.search);
-    } catch (e) {
+    } catch (_e) {
       // History API may not be available in some environments
     }
     els.modal.classList.remove('open');
@@ -680,7 +680,7 @@ const App = (() => {
           document.execCommand('copy');
           showToast('Copied!');
           setCopied();
-        } catch (e) {
+        } catch (_e) {
           showToast('Error copying', true);
         }
         document.body.removeChild(t);

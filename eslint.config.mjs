@@ -16,7 +16,13 @@ export default [
 
     rules: {
       // Safety
-      'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      'no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
       'no-undef': 'error',
       'no-redeclare': 'error',
 

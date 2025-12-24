@@ -1351,7 +1351,7 @@
     _encodeUTF8Base64(str) {
       try {
         return btoa(str);
-      } catch (e) {
+      } catch (_e) {
         try {
           return btoa(
             encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (m, p1) =>
@@ -1372,7 +1372,7 @@
             .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
             .join('')
         );
-      } catch (e) {
+      } catch (_e) {
         return atob(base64);
       }
     }
@@ -1414,7 +1414,7 @@
       let data;
       try {
         data = JSON.parse(STR);
-      } catch (e) {
+      } catch (_e) {
         return this._setError('JSON Error');
       }
 
