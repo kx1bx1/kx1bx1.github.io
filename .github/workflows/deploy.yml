@@ -1,4 +1,4 @@
-name: CD -- Deploy to GitHub Pages
+name: Deploy to GitHub Pages
 
 on:
   push:
@@ -9,24 +9,19 @@ permissions:
 
 jobs:
   deploy:
-    name: Deploy
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
 
-      - name: Install dependencies
-        run: npm ci
+      - run: npm ci
 
-      - name: Run predeploy checks
-        run: npm run predeploy
+      - run: npm run predeploy
 
       - name: Configure git identity
         run: |
@@ -36,4 +31,4 @@ jobs:
       - name: Deploy to GitHub Pages
         run: npm run deploy
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
