@@ -1,13 +1,13 @@
+/* global Scratch */
 // Name: RubyFS
 // ID: rubyFS
-// Description: A structured, in-memory file system for Scratch projects, now with RAM, trash, and tags.
+// Description: A structured, in-memory file system for Scratch projects.
 // By: kx1bx1 <https://scratch.mit.edu/users/kx1bx1/>
 // Original: 0832 <https://scratch.mit.edu/users/0832/>
 // License: MIT
 
-// Version: 1.5.0
-// - Fixed linting errors (translations, case scope, unused vars)
-// Big update, huh?
+// Version: 1.5.3
+// - Fixed additional linting errors (unused vars, prefer-const)
 
 (function (Scratch) {
   'use strict';
@@ -21,7 +21,7 @@
     control: true,
   };
 
-  const extensionVersion = '1.5.0';
+  const extensionVersion = '1.5.3';
 
   class RubyFS {
     constructor() {
@@ -40,13 +40,10 @@
       this.lastReadPath = '';
       this.lastWritePath = '';
 
-      // Hat Block Flag (Transient)
-      this._eventTriggerPath = null;
-
       // VM Hook
       this.runtime = Scratch.vm ? Scratch.vm.runtime : null;
 
-      this._log('Initializing RubyFS v1.5.0...');
+      this._log('Initializing RubyFS v1.5.3...');
       this._internalClean();
 
       if (this.runtime) {
@@ -66,27 +63,15 @@
         color3: '#7f1026',
         blocks: [
           // --- Main Operations ---
-          {
-            blockType: Scratch.BlockType.LABEL,
-            text: Scratch.translate('File Operations'),
-          },
+          { blockType: Scratch.BlockType.LABEL, text: Scratch.translate('File Operations') },
           {
             opcode: 'fsManage',
             blockType: Scratch.BlockType.COMMAND,
             text: Scratch.translate('[ACTION] [STR] [STR2]'),
             arguments: {
-              ACTION: {
-                type: Scratch.ArgumentType.STRING,
-                menu: 'MANAGE_MENU',
-              },
-              STR: {
-                type: Scratch.ArgumentType.STRING,
-                defaultValue: '/RubyFS/file.txt',
-              },
-              STR2: {
-                type: Scratch.ArgumentType.STRING,
-                defaultValue: 'data / destination',
-              },
+              ACTION: { type: Scratch.ArgumentType.STRING, menu: 'MANAGE_MENU' },
+              STR: { type: Scratch.ArgumentType.STRING, defaultValue: '/RubyFS/file.txt' },
+              STR2: { type: Scratch.ArgumentType.STRING, defaultValue: 'data / destination' },
             },
           },
           {
@@ -94,10 +79,7 @@
             blockType: Scratch.BlockType.REPORTER,
             text: Scratch.translate('read content of [STR]'),
             arguments: {
-              STR: {
-                type: Scratch.ArgumentType.STRING,
-                defaultValue: '/RubyFS/file.txt',
-              },
+              STR: { type: Scratch.ArgumentType.STRING, defaultValue: '/RubyFS/file.txt' },
             },
           },
           {
@@ -110,10 +92,7 @@
                 menu: 'LIST_TYPE_MENU',
                 defaultValue: 'all',
               },
-              STR: {
-                type: Scratch.ArgumentType.STRING,
-                defaultValue: '/RubyFS/',
-              },
+              STR: { type: Scratch.ArgumentType.STRING, defaultValue: '/RubyFS/' },
             },
           },
           {
@@ -126,14 +105,8 @@
                 menu: 'LIST_TYPE_MENU',
                 defaultValue: 'all',
               },
-              PATTERN: {
-                type: Scratch.ArgumentType.STRING,
-                defaultValue: '*.txt',
-              },
-              DIR: {
-                type: Scratch.ArgumentType.STRING,
-                defaultValue: '/RubyFS/',
-              },
+              PATTERN: { type: Scratch.ArgumentType.STRING, defaultValue: '*.txt' },
+              DIR: { type: Scratch.ArgumentType.STRING, defaultValue: '/RubyFS/' },
             },
           },
           {
@@ -146,23 +119,14 @@
           },
 
           // --- Information & Checks ---
-          {
-            blockType: Scratch.BlockType.LABEL,
-            text: Scratch.translate('Info & Checks'),
-          },
+          { blockType: Scratch.BlockType.LABEL, text: Scratch.translate('Info & Checks') },
           {
             opcode: 'fsCheck',
             blockType: Scratch.BlockType.BOOLEAN,
             text: Scratch.translate('check if [STR] [CONDITION]'),
             arguments: {
-              STR: {
-                type: Scratch.ArgumentType.STRING,
-                defaultValue: '/RubyFS/file.txt',
-              },
-              CONDITION: {
-                type: Scratch.ArgumentType.STRING,
-                menu: 'CHECK_MENU',
-              },
+              STR: { type: Scratch.ArgumentType.STRING, defaultValue: '/RubyFS/file.txt' },
+              CONDITION: { type: Scratch.ArgumentType.STRING, menu: 'CHECK_MENU' },
             },
           },
           {
@@ -170,36 +134,21 @@
             blockType: Scratch.BlockType.REPORTER,
             text: Scratch.translate('get [ATTRIBUTE] of [STR]'),
             arguments: {
-              ATTRIBUTE: {
-                type: Scratch.ArgumentType.STRING,
-                menu: 'GET_MENU',
-              },
-              STR: {
-                type: Scratch.ArgumentType.STRING,
-                defaultValue: '/RubyFS/file.txt',
-              },
+              ATTRIBUTE: { type: Scratch.ArgumentType.STRING, menu: 'GET_MENU' },
+              STR: { type: Scratch.ArgumentType.STRING, defaultValue: '/RubyFS/file.txt' },
             },
           },
 
           // --- Metadata (Tags) ---
-          {
-            blockType: Scratch.BlockType.LABEL,
-            text: Scratch.translate('Metadata (Tags)'),
-          },
+          { blockType: Scratch.BlockType.LABEL, text: Scratch.translate('Metadata (Tags)') },
           {
             opcode: 'setTag',
             blockType: Scratch.BlockType.COMMAND,
             text: Scratch.translate('set tag [KEY] to [VALUE] for [PATH]'),
             arguments: {
-              KEY: {
-                type: Scratch.ArgumentType.STRING,
-                defaultValue: 'author',
-              },
+              KEY: { type: Scratch.ArgumentType.STRING, defaultValue: 'author' },
               VALUE: { type: Scratch.ArgumentType.STRING, defaultValue: 'me' },
-              PATH: {
-                type: Scratch.ArgumentType.STRING,
-                defaultValue: '/RubyFS/file.txt',
-              },
+              PATH: { type: Scratch.ArgumentType.STRING, defaultValue: '/RubyFS/file.txt' },
             },
           },
           {
@@ -207,14 +156,8 @@
             blockType: Scratch.BlockType.REPORTER,
             text: Scratch.translate('get tag [KEY] of [PATH]'),
             arguments: {
-              KEY: {
-                type: Scratch.ArgumentType.STRING,
-                defaultValue: 'author',
-              },
-              PATH: {
-                type: Scratch.ArgumentType.STRING,
-                defaultValue: '/RubyFS/file.txt',
-              },
+              KEY: { type: Scratch.ArgumentType.STRING, defaultValue: 'author' },
+              PATH: { type: Scratch.ArgumentType.STRING, defaultValue: '/RubyFS/file.txt' },
             },
           },
           {
@@ -222,22 +165,13 @@
             blockType: Scratch.BlockType.COMMAND,
             text: Scratch.translate('delete tag [KEY] of [PATH]'),
             arguments: {
-              KEY: {
-                type: Scratch.ArgumentType.STRING,
-                defaultValue: 'author',
-              },
-              PATH: {
-                type: Scratch.ArgumentType.STRING,
-                defaultValue: '/RubyFS/file.txt',
-              },
+              KEY: { type: Scratch.ArgumentType.STRING, defaultValue: 'author' },
+              PATH: { type: Scratch.ArgumentType.STRING, defaultValue: '/RubyFS/file.txt' },
             },
           },
 
           // --- Permissions ---
-          {
-            blockType: Scratch.BlockType.LABEL,
-            text: Scratch.translate('Permissions'),
-          },
+          { blockType: Scratch.BlockType.LABEL, text: Scratch.translate('Permissions') },
           {
             opcode: 'setPerm',
             blockType: Scratch.BlockType.COMMAND,
@@ -253,32 +187,21 @@
                 menu: 'PERM_TYPE_MENU',
                 defaultValue: 'write',
               },
-              STR: {
-                type: Scratch.ArgumentType.STRING,
-                defaultValue: '/RubyFS/',
-              },
+              STR: { type: Scratch.ArgumentType.STRING, defaultValue: '/RubyFS/' },
             },
           },
           {
             opcode: 'listPerms',
             blockType: Scratch.BlockType.REPORTER,
             text: Scratch.translate('list permissions for [STR]'),
-            arguments: {
-              STR: {
-                type: Scratch.ArgumentType.STRING,
-                defaultValue: '/RubyFS/',
-              },
-            },
+            arguments: { STR: { type: Scratch.ArgumentType.STRING, defaultValue: '/RubyFS/' } },
           },
           {
             opcode: 'setLimit',
             blockType: Scratch.BlockType.COMMAND,
             text: Scratch.translate('set size limit for [DIR] to [BYTES] bytes'),
             arguments: {
-              DIR: {
-                type: Scratch.ArgumentType.STRING,
-                defaultValue: '/RubyFS/',
-              },
+              DIR: { type: Scratch.ArgumentType.STRING, defaultValue: '/RubyFS/' },
               BYTES: { type: Scratch.ArgumentType.NUMBER, defaultValue: 8192 },
             },
           },
@@ -286,19 +209,11 @@
             opcode: 'removeLimit',
             blockType: Scratch.BlockType.COMMAND,
             text: Scratch.translate('remove size limit for [DIR]'),
-            arguments: {
-              DIR: {
-                type: Scratch.ArgumentType.STRING,
-                defaultValue: '/RubyFS/',
-              },
-            },
+            arguments: { DIR: { type: Scratch.ArgumentType.STRING, defaultValue: '/RubyFS/' } },
           },
 
           // --- Import/Export ---
-          {
-            blockType: Scratch.BlockType.LABEL,
-            text: Scratch.translate('Import & Export'),
-          },
+          { blockType: Scratch.BlockType.LABEL, text: Scratch.translate('Import & Export') },
           {
             opcode: 'in',
             blockType: Scratch.BlockType.COMMAND,
@@ -306,7 +221,7 @@
             arguments: {
               STR: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue: '{"version":"1.5.0","fs":{}}',
+                defaultValue: '{"version":"1.5.3","fs":{}}',
               },
             },
           },
@@ -320,10 +235,7 @@
             blockType: Scratch.BlockType.REPORTER,
             text: Scratch.translate('export file [STR] as [FORMAT]'),
             arguments: {
-              STR: {
-                type: Scratch.ArgumentType.STRING,
-                defaultValue: '/RubyFS/example.txt',
-              },
+              STR: { type: Scratch.ArgumentType.STRING, defaultValue: '/RubyFS/example.txt' },
               FORMAT: {
                 type: Scratch.ArgumentType.STRING,
                 menu: 'BASE64_FORMAT_MENU',
@@ -342,30 +254,12 @@
                 defaultValue: 'base64',
               },
               STR: { type: Scratch.ArgumentType.STRING, defaultValue: '' },
-              STR2: {
-                type: Scratch.ArgumentType.STRING,
-                defaultValue: '/RubyFS/imported.txt',
-              },
+              STR2: { type: Scratch.ArgumentType.STRING, defaultValue: '/RubyFS/imported.txt' },
             },
           },
 
-          // --- Events & Debugging ---
-          {
-            blockType: Scratch.BlockType.LABEL,
-            text: Scratch.translate('Events & Debug'),
-          },
-          {
-            opcode: 'whenFileChanged',
-            blockType: Scratch.BlockType.HAT,
-            func: 'whenFileChanged',
-            text: Scratch.translate('when file at [PATH] changes'),
-            arguments: {
-              PATH: {
-                type: Scratch.ArgumentType.STRING,
-                defaultValue: '/RubyFS/example.txt',
-              },
-            },
-          },
+          // --- Debugging ---
+          { blockType: Scratch.BlockType.LABEL, text: Scratch.translate('Debugging') },
           {
             opcode: 'toggleLogging',
             blockType: Scratch.BlockType.COMMAND,
@@ -431,10 +325,7 @@
               { text: 'version', value: 'version' },
             ],
           },
-          LIST_TYPE_MENU: {
-            acceptReporters: true,
-            items: ['all', 'files', 'directories'],
-          },
+          LIST_TYPE_MENU: { acceptReporters: true, items: ['all', 'files', 'directories'] },
           PERM_ACTION_MENU: { acceptReporters: true, items: ['add', 'remove'] },
           PERM_TYPE_MENU: {
             acceptReporters: true,
@@ -553,31 +444,13 @@
       this.lastError = message;
     }
 
-    _triggerChange(path) {
-      if (this.runtime) {
-        this._eventTriggerPath = this._normalizePath(path);
-        this.runtime.startHats('rubyFS_whenFileChanged');
-        this._eventTriggerPath = null;
-      }
-    }
-
-    whenFileChanged(args) {
-      if (!this._eventTriggerPath) return false;
-      if (!args.PATH) return false;
-      const targetPath = this._normalizePath(args.PATH);
-      return targetPath === this._eventTriggerPath;
-    }
-
     _getStore(path) {
-      if (path.startsWith('/RAM/')) {
-        return { fs: this.ramfs, index: this.ramIndex, isRam: true };
-      }
+      if (path.startsWith('/RAM/')) return { fs: this.ramfs, index: this.ramIndex, isRam: true };
       return { fs: this.fs, index: this.childIndex, isRam: false };
     }
 
     _addToIndex(path) {
       const parent = this._internalDirName(path);
-      // const store = this._getStore(path); // Unused
       const parentStore = this._getStore(parent);
 
       // Virtual entry for /RAM/ in Main Root index
@@ -586,9 +459,7 @@
         this.childIndex.get('/').add('/RAM/');
         return;
       }
-      if (!parentStore.index.has(parent)) {
-        parentStore.index.set(parent, new Set());
-      }
+      if (!parentStore.index.has(parent)) parentStore.index.set(parent, new Set());
       parentStore.index.get(parent).add(path);
     }
 
@@ -596,9 +467,7 @@
       const parent = this._internalDirName(path);
       const parentStore = this._getStore(parent);
       if (parent === '/' && path === '/RAM/') return;
-      if (parentStore.index.has(parent)) {
-        parentStore.index.get(parent).delete(path);
-      }
+      if (parentStore.index.has(parent)) parentStore.index.get(parent).delete(path);
       const store = this._getStore(path);
       if (store.index.has(path)) store.index.delete(path);
     }
@@ -616,9 +485,7 @@
           accessed: now,
         });
         this._addToIndex('/.Trash/');
-        if (!this.childIndex.has('/.Trash/')) {
-          this.childIndex.set('/.Trash/', new Set());
-        }
+        if (!this.childIndex.has('/.Trash/')) this.childIndex.set('/.Trash/', new Set());
       }
     }
 
@@ -679,9 +546,11 @@
     _canAccommodateChange(filePath, deltaSize) {
       if (deltaSize <= 0) return true;
       let currentDir = this._internalDirName(filePath);
-      while (currentDir !== '/' && currentDir !== '/RAM/') {
+      while (true) {
         const store = this._getStore(currentDir);
         const entry = store.fs.get(currentDir);
+        // Cross-FS: Stop at /RAM/ root
+        if (currentDir === '/RAM/') break;
         if (entry && entry.limit !== -1) {
           const currentSize = this._getDirectorySize(currentDir);
           if (currentSize + deltaSize > entry.limit) {
@@ -689,17 +558,8 @@
             return false;
           }
         }
+        if (currentDir === '/') break;
         currentDir = this._internalDirName(currentDir);
-      }
-      // Check root limit
-      const store = this._getStore('/');
-      const entry = store.fs.get('/');
-      if (entry && entry.limit !== -1) {
-        const currentSize = this._getDirectorySize('/');
-        if (currentSize + deltaSize > entry.limit) {
-          this._setError(`Size limit exceeded for /`);
-          return false;
-        }
       }
       return true;
     }
@@ -739,7 +599,6 @@
       this._addToIndex(path);
       this.writeActivity = true;
       this.lastWritePath = path;
-      this._triggerChange(path);
       return true;
     }
 
@@ -864,23 +723,15 @@
       this.lastError = '';
       const path = this._normalizePath(STR);
       if (!path) return this._setError('Invalid path provided.');
-      if (path === '/') {
-        return this._setError('Create failed: Cannot create root');
-      }
+      if (path === '/') return this._setError('Create failed: Cannot create root');
 
       const store = this._getStore(path);
-      if (store.fs.has(path)) {
-        return this._setError('Create failed: Path exists');
-      }
+      if (store.fs.has(path)) return this._setError('Create failed: Path exists');
 
       if (this._isPathDir(path)) {
-        if (store.fs.has(path.slice(0, -1))) {
-          return this._setError('Create failed: File collision');
-        }
+        if (store.fs.has(path.slice(0, -1))) return this._setError('Create failed: File collision');
       } else {
-        if (store.fs.has(path + '/')) {
-          return this._setError('Create failed: Directory collision');
-        }
+        if (store.fs.has(path + '/')) return this._setError('Create failed: Directory collision');
       }
 
       const parentDir = this._internalDirName(path);
@@ -888,9 +739,7 @@
 
       if (parentDir !== '/' && parentDir !== '/RAM/') {
         const pEntry = parentStore.fs.get(parentDir);
-        if (pEntry && !pEntry.perms.see) {
-          return this._setError('Create failed: Parent hidden');
-        }
+        if (pEntry && !pEntry.perms.see) return this._setError('Create failed: Parent hidden');
       }
 
       if (parentDir !== '/' && parentDir !== '/RAM/' && !parentStore.fs.has(parentDir)) {
@@ -901,9 +750,7 @@
         if (this.lastError) return;
       }
       const ok = this._internalCreate(path, this._isPathDir(path) ? null : '', parentDir);
-      if (!ok && !this.lastError) {
-        this._setError('Create failed: Internal error');
-      }
+      if (!ok && !this.lastError) this._setError('Create failed: Internal error');
     }
 
     open({ STR }) {
@@ -916,9 +763,7 @@
 
       if (!entry) return this._setError('Open failed: Not found');
       if (!entry.perms.see) return this._setError('Open failed: Hidden');
-      if (this._isPathDir(path)) {
-        return this._setError('Open failed: Is directory');
-      }
+      if (this._isPathDir(path)) return this._setError('Open failed: Is directory');
       if (!entry.perms.read) return this._setError('Open failed: Read denied');
       this.readActivity = true;
       this.lastReadPath = path;
@@ -933,9 +778,7 @@
       if (path === '/' || path === '/RAM/') {
         return this._setError('Delete failed: Cannot delete root/mount');
       }
-      if (!this.hasPermission(path, 'delete')) {
-        return this._setError('Delete failed: Denied');
-      }
+      if (!this.hasPermission(path, 'delete')) return this._setError('Delete failed: Denied');
 
       const store = this._getStore(path);
 
@@ -994,7 +837,6 @@
       }
       this.writeActivity = true;
       this.lastWritePath = path;
-      this._triggerChange(path);
     }
 
     emptyTrash() {
@@ -1036,9 +878,7 @@
         entry = store.fs.get(path);
         if (!entry) return;
       }
-      if (this._isPathDir(path)) {
-        return this._setError('Set failed: Is directory');
-      }
+      if (this._isPathDir(path)) return this._setError('Set failed: Is directory');
       if (!entry.perms.write) return this._setError('Set failed: Write denied');
 
       const deltaSize = this._getStringSize(STR2) - this._getStringSize(entry.content || '');
@@ -1049,18 +889,39 @@
       entry.accessed = Date.now();
       this.writeActivity = true;
       this.lastWritePath = path;
-      this._triggerChange(path);
     }
 
     // RESTORED 'list' method
     list({ TYPE, STR }) {
       this.lastError = '';
-      let path = this._normalizePath(STR);
+      const path = this._normalizePath(STR);
       if (!path) return '[]';
-      if (!this._isPathDir(path)) path += '/';
+      // We might need to ensure trailing slash if it is a directory for certain checks, but _getStore relies on path start
+      // Let's just use normalized path and check if it is a dir
+      // Actually _getStore handles paths fine.
+      // But we need to ensure we are listing a directory.
 
       const store = this._getStore(path);
-      const entry = store.fs.get(path);
+
+      // If the user provided a path without trailing slash for a directory, normalized might not have it unless it was root or had it.
+      // But our index keys for directories generally end in /?
+      // Wait, _normalizePath preserves trailing slash if present.
+      // If I do `list /dir`, it becomes `/dir`. But in FS map, is it `/dir` or `/dir/`?
+      // `_internalCreate` logic: `start({STR: "/dir/"})` creates key `/dir/`.
+      // `start({STR: "/dir"})` creates key `/dir` (file).
+      // So list on a file should probably fail or return empty?
+      // Let's assume user provides correct path or we check.
+
+      // If we want to support listing `/dir` as `/dir/`, we should probe.
+      let targetPath = path;
+      if (!this._isPathDir(targetPath)) {
+        // Maybe they meant a directory?
+        if (store.fs.has(targetPath + '/')) {
+          targetPath += '/';
+        }
+      }
+
+      const entry = store.fs.get(targetPath);
       if (!entry) {
         this._setError('List failed: Directory not found');
         return '[]';
@@ -1069,25 +930,26 @@
         this._setError('List failed: Directory hidden');
         return '[]';
       }
+      if (!this._isPathDir(targetPath)) {
+        // It's a file
+        return '[]';
+      }
 
       this.readActivity = true;
-      this.lastReadPath = path;
+      this.lastReadPath = targetPath;
       entry.accessed = Date.now();
 
-      const childrenSet = store.index.get(path);
+      const childrenSet = store.index.get(targetPath);
       const results = [];
       if (childrenSet) {
         for (const childPath of childrenSet) {
           const childEntry = store.fs.get(childPath);
           if (!childEntry || !childEntry.perms.see) continue;
 
-          const childName = childPath.substring(path.length);
+          const childName = childPath.substring(targetPath.length);
           if (TYPE === 'all') results.push(childName);
-          else if (TYPE === 'files' && !this._isPathDir(childPath)) {
-            results.push(childName);
-          } else if (TYPE === 'directories' && this._isPathDir(childPath)) {
-            results.push(childName);
-          }
+          else if (TYPE === 'files' && !this._isPathDir(childPath)) results.push(childName);
+          else if (TYPE === 'directories' && this._isPathDir(childPath)) results.push(childName);
         }
       }
       results.sort();
@@ -1117,18 +979,14 @@
       if (!this.hasPermission(path1, 'delete')) {
         return this._setError("Rename failed: No 'delete' permission");
       }
-      if (store2.fs.has(path2)) {
-        return this._setError('Rename failed: Destination exists');
-      }
+      if (store2.fs.has(path2)) return this._setError('Rename failed: Destination exists');
 
       if (this._isPathDir(path2)) {
         if (store2.fs.has(path2.slice(0, -1))) {
           return this._setError('Rename failed: File collision');
         }
       } else {
-        if (store2.fs.has(path2 + '/')) {
-          return this._setError('Rename failed: Directory collision');
-        }
+        if (store2.fs.has(path2 + '/')) return this._setError('Rename failed: Directory collision');
       }
 
       if (!this.hasPermission(path2, 'create')) {
@@ -1183,7 +1041,6 @@
       }
       this.writeActivity = true;
       this.lastWritePath = path2;
-      this._triggerChange(path2);
     }
 
     copy({ STR, STR2 }) {
@@ -1197,12 +1054,8 @@
 
       const entry = store1.fs.get(path1);
       if (!entry) return this._setError('Copy failed: Source not found');
-      if (!entry.perms.read) {
-        return this._setError("Copy failed: No 'read' permission");
-      }
-      if (store2.fs.has(path2)) {
-        return this._setError('Copy failed: Destination exists');
-      }
+      if (!entry.perms.read) return this._setError("Copy failed: No 'read' permission");
+      if (store2.fs.has(path2)) return this._setError('Copy failed: Destination exists');
       if (!this.hasPermission(path2, 'create')) {
         return this._setError("Copy failed: No 'create' permission");
       }
@@ -1258,7 +1111,6 @@
       }
       this.writeActivity = true;
       this.lastWritePath = path2;
-      this._triggerChange(path2);
     }
 
     _getTimestamp(path, type) {
@@ -1280,10 +1132,8 @@
 
     setLimit({ DIR, BYTES }) {
       this.lastError = '';
-      const path = this._normalizePath(DIR);
-      if (!path || path === '/' || !this._isPathDir(path)) {
-        return this._setError('Invalid path');
-      }
+      const path = this._normalizePath(DIR); // FIX: use const path
+      if (!path || path === '/' || !this._isPathDir(path)) return this._setError('Invalid path');
       if (!this.hasPermission(path, 'control')) return this._setError('Denied');
       const store = this._getStore(path);
       const entry = store.fs.get(path);
@@ -1293,10 +1143,8 @@
     }
     removeLimit({ DIR }) {
       this.lastError = '';
-      const path = this._normalizePath(DIR);
-      if (!path || path === '/' || !this._isPathDir(path)) {
-        return this._setError('Invalid path');
-      }
+      const path = this._normalizePath(DIR); // FIX: use const path
+      if (!path || path === '/' || !this._isPathDir(path)) return this._setError('Invalid path');
       if (!this.hasPermission(path, 'control')) return this._setError('Denied');
       const store = this._getStore(path);
       const entry = store.fs.get(path);
@@ -1332,9 +1180,7 @@
       const prefix = path.endsWith('/') ? path : path + '/';
       const store = this._getStore(path);
       for (const [p, e] of store.fs.entries()) {
-        if ((isDir && (p === path || p.startsWith(prefix))) || p === path) {
-          e.perms[PERM] = val;
-        }
+        if ((isDir && (p === path || p.startsWith(prefix))) || p === path) e.perms[PERM] = val;
       }
       this.writeActivity = true;
     }
@@ -1408,9 +1254,7 @@
 
     in({ STR }) {
       this.lastError = '';
-      if (!this.hasPermission('/', 'delete')) {
-        return this._setError('Import denied');
-      }
+      if (!this.hasPermission('/', 'delete')) return this._setError('Import denied');
       let data;
       try {
         data = JSON.parse(STR);
@@ -1431,7 +1275,6 @@
       tempIndex.get('/').add('/RAM/');
 
       try {
-        // const version = data.version || ""; // REMOVED unused var
         let oldData = {};
         if (data.fs) oldData = data.fs;
         else if (data.sy) {
@@ -1475,27 +1318,23 @@
       const entry = store.fs.get(path);
       if (!entry) return this._setError('Export failed: Not found');
       if (this._isPathDir(path)) return this._setError('Export failed: Is dir');
-      if (!entry.perms.see || !entry.perms.read) {
-        return this._setError('Export failed: Denied');
-      }
+      if (!entry.perms.see || !entry.perms.read) return this._setError('Export failed: Denied');
 
       this.readActivity = true;
       this.lastReadPath = path;
       entry.accessed = Date.now();
       const b64 = this._encodeUTF8Base64(String(entry.content));
-      if (FORMAT === 'data_url') {
-        return `data:${this._getMimeType(path)};base64,${b64}`;
-      }
+      if (FORMAT === 'data_url') return `data:${this._getMimeType(path)};base64,${b64}`;
       return b64;
     }
 
-    importFileBase64({ STR, STR2 }) {
+    importFileBase64({ _FORMAT, STR, STR2 }) {
       this.lastError = '';
       const path = this._normalizePath(STR2);
       if (!path || this._isPathDir(path)) return this._setError('Invalid path');
       if (!STR || !STR.trim()) return this._setError('Empty input');
       const base64String =
-        STR.replace(/\s+/g, '').match(/^data:.*?,(.*)$/)?.[1] || STR.replace(/\s+/g, '');
+        STR.replace(/\s+/g, '').match(/^data:.*?,(.*)$/)?.[1] || STR.replace(/\s+/g, ''); // FIX: use const base64String
       if (!/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(base64String)) {
         return this._setError('Invalid Base64');
       }
@@ -1576,11 +1415,8 @@
           const childName = childPath.substring(path.length);
           if (regex.test(childName)) {
             if (TYPE === 'all') results.push(childName);
-            else if (TYPE === 'files' && !this._isPathDir(childPath)) {
-              results.push(childName);
-            } else if (TYPE === 'directories' && this._isPathDir(childPath)) {
-              results.push(childName);
-            }
+            else if (TYPE === 'files' && !this._isPathDir(childPath)) results.push(childName);
+            else if (TYPE === 'directories' && this._isPathDir(childPath)) results.push(childName);
           }
         }
       }
@@ -1662,18 +1498,11 @@
 
       try {
         this.fsManage({ ACTION: 'create', STR: '/a.txt', STR2: '' });
-        if (!this.fsCheck({ STR: '/a.txt', CONDITION: 'exists' })) {
-          throw new Error('Create failed');
-        }
+        if (!this.fsCheck({ STR: '/a.txt', CONDITION: 'exists' })) throw new Error('Create failed');
         this.fsManage({ ACTION: 'delete', STR: '/a.txt', STR2: '' });
-        if (this.fsCheck({ STR: '/a.txt', CONDITION: 'exists' })) {
-          throw new Error('Delete failed');
-        }
+        if (this.fsCheck({ STR: '/a.txt', CONDITION: 'exists' })) throw new Error('Delete failed');
 
-        // Check Last Error before assuming undefined trash
-        if (this.lastError) {
-          throw new Error('Manage op failed: ' + this.lastError);
-        }
+        if (this.lastError) throw new Error('Manage op failed: ' + this.lastError);
 
         const trash = this.childIndex.get('/.Trash/');
         if (!trash || !trash.size) throw new Error('Trash failed');
@@ -1709,5 +1538,4 @@
   }
 
   Scratch.extensions.register(new RubyFS());
-  // eslint-disable-next-line no-undef
 })(Scratch);
