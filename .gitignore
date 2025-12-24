@@ -4,3 +4,6 @@
 # Build/distribution artifacts
 /build/
 /dist/
+
+# Environment variables and secrets
+/.env
