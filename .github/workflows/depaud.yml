@@ -1,4 +1,6 @@
 name: Dependency audits
+permissions:
+  contents: read
 
 on:
   workflow_dispatch:
