@@ -267,14 +267,18 @@ const App = (() => {
               } text-3xl" aria-hidden="true"></i>`;
 
         let badgeHTML = "";
-        if (ext.featured)
+        if (ext.featured) {
           badgeHTML += `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 uppercase tracking-wide mr-2">Featured</span>`;
-        if (ext.isNew)
+        }
+        if (ext.isNew) {
           badgeHTML += `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20 uppercase tracking-wide mr-2">New</span>`;
-        if (ext.unsandboxed)
+        }
+        if (ext.unsandboxed) {
           badgeHTML += `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 uppercase tracking-wide mr-2" title="Unsandboxed">Unsandboxed</span>`;
-        if (ext.isMod)
+        }
+        if (ext.isMod) {
           badgeHTML += `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border border-yellow-500/20 uppercase tracking-wide" title="Mod">Mod</span>`;
+        }
 
         article.innerHTML = `
                     <div class="flex items-start justify-between mb-4">
@@ -408,7 +412,7 @@ const App = (() => {
 
     const sortMode = els.sortSelect.value;
 
-    let filtered = extensions.filter((ext) => {
+    const filtered = extensions.filter((ext) => {
       const matchesSearch = !query || ext.searchString.includes(query);
       const matchesCategory =
         currentCategory === "all" ||
@@ -505,8 +509,9 @@ const App = (() => {
       if (["INPUT", "TEXTAREA"].includes(e.target.tagName)) {
         if (e.key === "Escape") {
           e.target.blur();
-          if (e.target === els.searchInput && els.searchInput.value)
+          if (e.target === els.searchInput && els.searchInput.value) {
             resetFilters();
+          }
         }
         return;
       }
@@ -600,10 +605,12 @@ const App = (() => {
     }
 
     let badgeHTML = "";
-    if (ext.featured)
+    if (ext.featured) {
       badgeHTML += `<span class="px-2 py-0.5 rounded text-xs font-bold bg-purple-100 text-purple-700 dark:bg-purple-500/10 dark:text-purple-400 border border-purple-200 dark:border-purple-500/20 uppercase">Featured</span>`;
-    if (ext.unsandboxed)
+    }
+    if (ext.unsandboxed) {
       badgeHTML += `<span class="px-2 py-0.5 rounded text-xs font-bold bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400 border border-red-200 dark:border-red-500/20 uppercase flex items-center gap-1"><i class="ph-bold ph-warning"></i> Unsandboxed</span>`;
+    }
     els.modalBadges.innerHTML = badgeHTML;
 
     const newDownload = els.modalDownloadBtn.cloneNode(true);
