@@ -9,7 +9,8 @@
     "lint:fix": "eslint ./src/script.js --fix",
     "format": "prettier --write .",
     "predeploy": "npm run lint && npm run format",
-    "deploy": "gh-pages -d ./src/"
+    "deploy": "gh-pages -d ./src/",
+    "format:check": "prettier --check ."
   },
   "keywords": [
     "turbowarp",
