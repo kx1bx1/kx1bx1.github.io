@@ -4,7 +4,7 @@
   "description": "A gallery of custom extensions for TurboWarp developed by kx1bx1.",
   "main": "index.html",
   "scripts": {
-    "start": "npx serve .",
+    "start": "npx serve ./src/",
     "lint": "eslint script.js",
     "lint:fix": "eslint script.js --fix",
     "format": "prettier --write .",
