@@ -19,7 +19,7 @@
   "author": "kx1bx1",
   "license": "GPL-3.0",
   "devDependencies": {
-    "eslint": "^8.57.0",
+    "eslint": "^9.39.2",
     "globals": "^16.5.0",
     "prettier": "^3.2.5"
   }
