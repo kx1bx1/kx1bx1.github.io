@@ -2,14 +2,14 @@
   "name": "kx1bx1-extension-gallery",
   "version": "1.0.0",
   "description": "A gallery of custom extensions for TurboWarp developed by kx1bx1.",
-  "main": "index.html",
+  "main": "./src/index.html",
   "scripts": {
     "start": "npx serve ./src/",
-    "lint": "eslint script.js",
-    "lint:fix": "eslint script.js --fix",
+    "lint": "eslint ./src/script.js",
+    "lint:fix": "eslint ./src/script.js --fix",
     "format": "prettier --write .",
     "predeploy": "npm run lint && npm run format",
-    "deploy": "gh-pages -d ."
+    "deploy": "gh-pages -d ./src/"
   },
   "keywords": [
     "turbowarp",
