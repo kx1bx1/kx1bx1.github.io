@@ -10,9 +10,12 @@
 
   const dictionaries = new Map();
 
-  Scratch.vm.runtime.on('RUNTIME_DISPOSED', () => {
-    dictionaries.clear();
-  });
+  // Fix: Guard against missing VM in sandboxed environment
+  if (Scratch.vm && Scratch.vm.runtime) {
+    Scratch.vm.runtime.on('RUNTIME_DISPOSED', () => {
+      dictionaries.clear();
+    });
+  }
 
   const sanitize = (obj) => {
     if (!obj || typeof obj !== 'object') return obj;
