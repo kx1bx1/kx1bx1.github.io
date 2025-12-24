@@ -2,7 +2,7 @@
   "name": "RubyFS",
   "description": "A structured, in-memory file system for Scratch projects, now with RAM, trash, and tags.",
   "author": "kx1bx1",
-  "version": "1.0.0",
+  "version": "1.5.3",
   "category": "advanced",
   "unsandboxed": false,
   "entry": "extension.js"
