@@ -1,0 +1,122 @@
+body {
+  font-family: "Inter", sans-serif;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* Dark/Light Mode Transitions */
+.dark body {
+  background-color: #0f0f13;
+  color: #e2e8f0;
+}
+body {
+  background-color: #f8fafc;
+  color: #1e293b;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #333;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #444;
+}
+
+/* Card Interactions */
+.extension-card {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.extension-card:hover {
+  transform: translateY(-4px);
+}
+.dark .extension-card:hover {
+  box-shadow: 0 10px 30px -10px rgba(255, 76, 76, 0.15);
+  border-color: #ff4c4c;
+}
+.extension-card:hover {
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+  border-color: #ff4c4c;
+}
+
+/* Line Clamp & Firefox Support */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Modal Animation */
+.modal-backdrop {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.modal-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.modal-content {
+  transform: scale(0.95) translateY(10px);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.modal-backdrop.open .modal-content {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+
+/* Toast Animation */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+.toast {
+  animation: slideUp 0.3s ease forwards;
+}
+.toast.hiding {
+  animation: fadeOut 0.3s ease forwards;
+}
+
+/* Keyboard Shortcut Hint */
+.kbd-shortcut {
+  font-family: inherit;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.75rem;
+  border-width: 1px;
+}
+
+/* Accessibility Focus Styles */
+:focus-visible {
+  outline: 2px solid #ff4c4c;
+  outline-offset: 2px;
+}
