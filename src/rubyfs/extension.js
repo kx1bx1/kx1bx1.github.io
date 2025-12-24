@@ -10,7 +10,7 @@
 // Big update, huh?
 
 (function (Scratch) {
-  "use strict";
+  'use strict';
 
   const defaultPerms = {
     create: true,
@@ -21,7 +21,7 @@
     control: true,
   };
 
-  const extensionVersion = "1.5.0";
+  const extensionVersion = '1.5.0';
 
   class RubyFS {
     constructor() {
@@ -34,11 +34,11 @@
       this.ramIndex = new Map();
 
       this.RubyFSLogEnabled = false;
-      this.lastError = "";
+      this.lastError = '';
       this.readActivity = false;
       this.writeActivity = false;
-      this.lastReadPath = "";
-      this.lastWritePath = "";
+      this.lastReadPath = '';
+      this.lastWritePath = '';
 
       // Hat Block Flag (Transient)
       this._eventTriggerPath = null;
@@ -46,12 +46,12 @@
       // VM Hook
       this.runtime = Scratch.vm ? Scratch.vm.runtime : null;
 
-      this._log("Initializing RubyFS v1.5.0...");
+      this._log('Initializing RubyFS v1.5.0...');
       this._internalClean();
 
       if (this.runtime) {
-        this.runtime.on("PROJECT_START", () => {
-          this._log("Project start: Clearing RamDisk...");
+        this.runtime.on('PROJECT_START', () => {
+          this._log('Project start: Clearing RamDisk...');
           this.clearRamdisk();
         });
       }
@@ -59,126 +59,124 @@
 
     getInfo() {
       return {
-        id: "rubyFS",
-        name: Scratch.translate("RubyFS"),
-        color1: "#d52246",
-        color2: "#a61734",
-        color3: "#7f1026",
+        id: 'rubyFS',
+        name: Scratch.translate('RubyFS'),
+        color1: '#d52246',
+        color2: '#a61734',
+        color3: '#7f1026',
         blocks: [
           // --- Main Operations ---
           {
             blockType: Scratch.BlockType.LABEL,
-            text: Scratch.translate("File Operations"),
+            text: Scratch.translate('File Operations'),
           },
           {
-            opcode: "fsManage",
+            opcode: 'fsManage',
             blockType: Scratch.BlockType.COMMAND,
-            text: Scratch.translate("[ACTION] [STR] [STR2]"),
+            text: Scratch.translate('[ACTION] [STR] [STR2]'),
             arguments: {
               ACTION: {
                 type: Scratch.ArgumentType.STRING,
-                menu: "MANAGE_MENU",
+                menu: 'MANAGE_MENU',
               },
               STR: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue: "/RubyFS/file.txt",
+                defaultValue: '/RubyFS/file.txt',
               },
               STR2: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue: "data / destination",
+                defaultValue: 'data / destination',
               },
             },
           },
           {
-            opcode: "open",
+            opcode: 'open',
             blockType: Scratch.BlockType.REPORTER,
-            text: Scratch.translate("read content of [STR]"),
+            text: Scratch.translate('read content of [STR]'),
             arguments: {
               STR: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue: "/RubyFS/file.txt",
+                defaultValue: '/RubyFS/file.txt',
               },
             },
           },
           {
-            opcode: "list",
+            opcode: 'list',
             blockType: Scratch.BlockType.REPORTER,
-            text: Scratch.translate("list [TYPE] under [STR] as JSON"),
+            text: Scratch.translate('list [TYPE] under [STR] as JSON'),
             arguments: {
               TYPE: {
                 type: Scratch.ArgumentType.STRING,
-                menu: "LIST_TYPE_MENU",
-                defaultValue: "all",
+                menu: 'LIST_TYPE_MENU',
+                defaultValue: 'all',
               },
               STR: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue: "/RubyFS/",
+                defaultValue: '/RubyFS/',
               },
             },
           },
           {
-            opcode: "listGlob",
+            opcode: 'listGlob',
             blockType: Scratch.BlockType.REPORTER,
-            text: Scratch.translate(
-              "list [TYPE] matching [PATTERN] in [DIR] as JSON"
-            ),
+            text: Scratch.translate('list [TYPE] matching [PATTERN] in [DIR] as JSON'),
             arguments: {
               TYPE: {
                 type: Scratch.ArgumentType.STRING,
-                menu: "LIST_TYPE_MENU",
-                defaultValue: "all",
+                menu: 'LIST_TYPE_MENU',
+                defaultValue: 'all',
               },
               PATTERN: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue: "*.txt",
+                defaultValue: '*.txt',
               },
               DIR: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue: "/RubyFS/",
+                defaultValue: '/RubyFS/',
               },
             },
           },
           {
-            opcode: "fsClear",
+            opcode: 'fsClear',
             blockType: Scratch.BlockType.COMMAND,
-            text: Scratch.translate("clear [TARGET]"),
+            text: Scratch.translate('clear [TARGET]'),
             arguments: {
-              TARGET: { type: Scratch.ArgumentType.STRING, menu: "CLEAR_MENU" },
+              TARGET: { type: Scratch.ArgumentType.STRING, menu: 'CLEAR_MENU' },
             },
           },
 
           // --- Information & Checks ---
           {
             blockType: Scratch.BlockType.LABEL,
-            text: Scratch.translate("Info & Checks"),
+            text: Scratch.translate('Info & Checks'),
           },
           {
-            opcode: "fsCheck",
+            opcode: 'fsCheck',
             blockType: Scratch.BlockType.BOOLEAN,
-            text: Scratch.translate("check if [STR] [CONDITION]"),
+            text: Scratch.translate('check if [STR] [CONDITION]'),
             arguments: {
               STR: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue: "/RubyFS/file.txt",
+                defaultValue: '/RubyFS/file.txt',
               },
               CONDITION: {
                 type: Scratch.ArgumentType.STRING,
-                menu: "CHECK_MENU",
+                menu: 'CHECK_MENU',
               },
             },
           },
           {
-            opcode: "fsGet",
+            opcode: 'fsGet',
             blockType: Scratch.BlockType.REPORTER,
-            text: Scratch.translate("get [ATTRIBUTE] of [STR]"),
+            text: Scratch.translate('get [ATTRIBUTE] of [STR]'),
             arguments: {
               ATTRIBUTE: {
                 type: Scratch.ArgumentType.STRING,
-                menu: "GET_MENU",
+                menu: 'GET_MENU',
               },
               STR: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue: "/RubyFS/file.txt",
+                defaultValue: '/RubyFS/file.txt',
               },
             },
           },
@@ -186,51 +184,51 @@
           // --- Metadata (Tags) ---
           {
             blockType: Scratch.BlockType.LABEL,
-            text: Scratch.translate("Metadata (Tags)"),
+            text: Scratch.translate('Metadata (Tags)'),
           },
           {
-            opcode: "setTag",
+            opcode: 'setTag',
             blockType: Scratch.BlockType.COMMAND,
-            text: Scratch.translate("set tag [KEY] to [VALUE] for [PATH]"),
+            text: Scratch.translate('set tag [KEY] to [VALUE] for [PATH]'),
             arguments: {
               KEY: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue: "author",
+                defaultValue: 'author',
               },
-              VALUE: { type: Scratch.ArgumentType.STRING, defaultValue: "me" },
+              VALUE: { type: Scratch.ArgumentType.STRING, defaultValue: 'me' },
               PATH: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue: "/RubyFS/file.txt",
+                defaultValue: '/RubyFS/file.txt',
               },
             },
           },
           {
-            opcode: "getTag",
+            opcode: 'getTag',
             blockType: Scratch.BlockType.REPORTER,
-            text: Scratch.translate("get tag [KEY] of [PATH]"),
+            text: Scratch.translate('get tag [KEY] of [PATH]'),
             arguments: {
               KEY: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue: "author",
+                defaultValue: 'author',
               },
               PATH: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue: "/RubyFS/file.txt",
+                defaultValue: '/RubyFS/file.txt',
               },
             },
           },
           {
-            opcode: "deleteTag",
+            opcode: 'deleteTag',
             blockType: Scratch.BlockType.COMMAND,
-            text: Scratch.translate("delete tag [KEY] of [PATH]"),
+            text: Scratch.translate('delete tag [KEY] of [PATH]'),
             arguments: {
               KEY: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue: "author",
+                defaultValue: 'author',
               },
               PATH: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue: "/RubyFS/file.txt",
+                defaultValue: '/RubyFS/file.txt',
               },
             },
           },
@@ -238,62 +236,60 @@
           // --- Permissions ---
           {
             blockType: Scratch.BlockType.LABEL,
-            text: Scratch.translate("Permissions"),
+            text: Scratch.translate('Permissions'),
           },
           {
-            opcode: "setPerm",
+            opcode: 'setPerm',
             blockType: Scratch.BlockType.COMMAND,
-            text: Scratch.translate("[ACTION] [PERM] permission for [STR]"),
+            text: Scratch.translate('[ACTION] [PERM] permission for [STR]'),
             arguments: {
               ACTION: {
                 type: Scratch.ArgumentType.STRING,
-                menu: "PERM_ACTION_MENU",
-                defaultValue: "remove",
+                menu: 'PERM_ACTION_MENU',
+                defaultValue: 'remove',
               },
               PERM: {
                 type: Scratch.ArgumentType.STRING,
-                menu: "PERM_TYPE_MENU",
-                defaultValue: "write",
+                menu: 'PERM_TYPE_MENU',
+                defaultValue: 'write',
               },
               STR: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue: "/RubyFS/",
+                defaultValue: '/RubyFS/',
               },
             },
           },
           {
-            opcode: "listPerms",
+            opcode: 'listPerms',
             blockType: Scratch.BlockType.REPORTER,
-            text: Scratch.translate("list permissions for [STR]"),
+            text: Scratch.translate('list permissions for [STR]'),
             arguments: {
               STR: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue: "/RubyFS/",
+                defaultValue: '/RubyFS/',
               },
             },
           },
           {
-            opcode: "setLimit",
+            opcode: 'setLimit',
             blockType: Scratch.BlockType.COMMAND,
-            text: Scratch.translate(
-              "set size limit for [DIR] to [BYTES] bytes"
-            ),
+            text: Scratch.translate('set size limit for [DIR] to [BYTES] bytes'),
             arguments: {
               DIR: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue: "/RubyFS/",
+                defaultValue: '/RubyFS/',
               },
               BYTES: { type: Scratch.ArgumentType.NUMBER, defaultValue: 8192 },
             },
           },
           {
-            opcode: "removeLimit",
+            opcode: 'removeLimit',
             blockType: Scratch.BlockType.COMMAND,
-            text: Scratch.translate("remove size limit for [DIR]"),
+            text: Scratch.translate('remove size limit for [DIR]'),
             arguments: {
               DIR: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue: "/RubyFS/",
+                defaultValue: '/RubyFS/',
               },
             },
           },
@@ -301,12 +297,12 @@
           // --- Import/Export ---
           {
             blockType: Scratch.BlockType.LABEL,
-            text: Scratch.translate("Import & Export"),
+            text: Scratch.translate('Import & Export'),
           },
           {
-            opcode: "in",
+            opcode: 'in',
             blockType: Scratch.BlockType.COMMAND,
-            text: Scratch.translate("import file system from [STR]"),
+            text: Scratch.translate('import file system from [STR]'),
             arguments: {
               STR: {
                 type: Scratch.ArgumentType.STRING,
@@ -315,40 +311,40 @@
             },
           },
           {
-            opcode: "out",
+            opcode: 'out',
             blockType: Scratch.BlockType.REPORTER,
-            text: Scratch.translate("export file system"),
+            text: Scratch.translate('export file system'),
           },
           {
-            opcode: "exportFileBase64",
+            opcode: 'exportFileBase64',
             blockType: Scratch.BlockType.REPORTER,
-            text: Scratch.translate("export file [STR] as [FORMAT]"),
+            text: Scratch.translate('export file [STR] as [FORMAT]'),
             arguments: {
               STR: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue: "/RubyFS/example.txt",
+                defaultValue: '/RubyFS/example.txt',
               },
               FORMAT: {
                 type: Scratch.ArgumentType.STRING,
-                menu: "BASE64_FORMAT_MENU",
-                defaultValue: "base64",
+                menu: 'BASE64_FORMAT_MENU',
+                defaultValue: 'base64',
               },
             },
           },
           {
-            opcode: "importFileBase64",
+            opcode: 'importFileBase64',
             blockType: Scratch.BlockType.COMMAND,
-            text: Scratch.translate("import [FORMAT] [STR] to file [STR2]"),
+            text: Scratch.translate('import [FORMAT] [STR] to file [STR2]'),
             arguments: {
               FORMAT: {
                 type: Scratch.ArgumentType.STRING,
-                menu: "BASE64_FORMAT_MENU",
-                defaultValue: "base64",
+                menu: 'BASE64_FORMAT_MENU',
+                defaultValue: 'base64',
               },
-              STR: { type: Scratch.ArgumentType.STRING, defaultValue: "" },
+              STR: { type: Scratch.ArgumentType.STRING, defaultValue: '' },
               STR2: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue: "/RubyFS/imported.txt",
+                defaultValue: '/RubyFS/imported.txt',
               },
             },
           },
@@ -356,100 +352,100 @@
           // --- Events & Debugging ---
           {
             blockType: Scratch.BlockType.LABEL,
-            text: Scratch.translate("Events & Debug"),
+            text: Scratch.translate('Events & Debug'),
           },
           {
-            opcode: "whenFileChanged",
+            opcode: 'whenFileChanged',
             blockType: Scratch.BlockType.HAT,
-            func: "whenFileChanged",
-            text: Scratch.translate("when file at [PATH] changes"),
+            func: 'whenFileChanged',
+            text: Scratch.translate('when file at [PATH] changes'),
             arguments: {
               PATH: {
                 type: Scratch.ArgumentType.STRING,
-                defaultValue: "/RubyFS/example.txt",
+                defaultValue: '/RubyFS/example.txt',
               },
             },
           },
           {
-            opcode: "toggleLogging",
+            opcode: 'toggleLogging',
             blockType: Scratch.BlockType.COMMAND,
-            text: Scratch.translate("turn [STATE] console logging"),
+            text: Scratch.translate('turn [STATE] console logging'),
             arguments: {
               STATE: {
                 type: Scratch.ArgumentType.STRING,
-                menu: "LOG_STATE_MENU",
-                defaultValue: "on",
+                menu: 'LOG_STATE_MENU',
+                defaultValue: 'on',
               },
             },
           },
           {
-            opcode: "runIntegrityTest",
+            opcode: 'runIntegrityTest',
             blockType: Scratch.BlockType.REPORTER,
-            text: Scratch.translate("run integrity test"),
+            text: Scratch.translate('run integrity test'),
           },
         ],
         menus: {
           MANAGE_MENU: {
             acceptReporters: true,
             items: [
-              { text: "create", value: "create" },
-              { text: "delete", value: "delete" },
-              { text: "set content to", value: "set" },
-              { text: "copy to", value: "copy" },
-              { text: "rename to", value: "rename" },
+              { text: 'create', value: 'create' },
+              { text: 'delete', value: 'delete' },
+              { text: 'set content to', value: 'set' },
+              { text: 'copy to', value: 'copy' },
+              { text: 'rename to', value: 'rename' },
             ],
           },
           CLEAR_MENU: {
             acceptReporters: true,
             items: [
-              { text: "filesystem", value: "all" },
-              { text: "trash", value: "trash" },
-              { text: "ramdisk", value: "ram" },
+              { text: 'filesystem', value: 'all' },
+              { text: 'trash', value: 'trash' },
+              { text: 'ramdisk', value: 'ram' },
             ],
           },
           CHECK_MENU: {
             acceptReporters: true,
             items: [
-              { text: "exists", value: "exists" },
-              { text: "is file", value: "file" },
-              { text: "is directory", value: "directory" },
-              { text: "was read", value: "read" },
-              { text: "was written", value: "written" },
+              { text: 'exists', value: 'exists' },
+              { text: 'is file', value: 'file' },
+              { text: 'is directory', value: 'directory' },
+              { text: 'was read', value: 'read' },
+              { text: 'was written', value: 'written' },
             ],
           },
           GET_MENU: {
             acceptReporters: true,
             items: [
-              { text: "file name", value: "name" },
-              { text: "directory path", value: "dir" },
-              { text: "size (bytes)", value: "size" },
-              { text: "size limit", value: "limit" },
-              { text: "hash (checksum)", value: "hash" },
-              { text: "tree structure", value: "tree" },
-              { text: "date created", value: "created" },
-              { text: "date modified", value: "modified" },
-              { text: "date accessed", value: "accessed" },
-              { text: "last read path", value: "lastRead" },
-              { text: "last write path", value: "lastWrite" },
-              { text: "last error", value: "error" },
-              { text: "version", value: "version" },
+              { text: 'file name', value: 'name' },
+              { text: 'directory path', value: 'dir' },
+              { text: 'size (bytes)', value: 'size' },
+              { text: 'size limit', value: 'limit' },
+              { text: 'hash (checksum)', value: 'hash' },
+              { text: 'tree structure', value: 'tree' },
+              { text: 'date created', value: 'created' },
+              { text: 'date modified', value: 'modified' },
+              { text: 'date accessed', value: 'accessed' },
+              { text: 'last read path', value: 'lastRead' },
+              { text: 'last write path', value: 'lastWrite' },
+              { text: 'last error', value: 'error' },
+              { text: 'version', value: 'version' },
             ],
           },
           LIST_TYPE_MENU: {
             acceptReporters: true,
-            items: ["all", "files", "directories"],
+            items: ['all', 'files', 'directories'],
           },
-          PERM_ACTION_MENU: { acceptReporters: true, items: ["add", "remove"] },
+          PERM_ACTION_MENU: { acceptReporters: true, items: ['add', 'remove'] },
           PERM_TYPE_MENU: {
             acceptReporters: true,
-            items: ["create", "delete", "see", "read", "write", "control"],
+            items: ['create', 'delete', 'see', 'read', 'write', 'control'],
           },
-          LOG_STATE_MENU: { acceptReporters: true, items: ["on", "off"] },
+          LOG_STATE_MENU: { acceptReporters: true, items: ['on', 'off'] },
           BASE64_FORMAT_MENU: {
             acceptReporters: true,
             items: [
-              { text: "Base64 String", value: "base64" },
-              { text: "Data URL", value: "data_url" },
+              { text: 'Base64 String', value: 'base64' },
+              { text: 'Data URL', value: 'data_url' },
             ],
           },
         },
@@ -459,21 +455,21 @@
     // --- CONSOLIDATED DISPATCHERS ---
 
     // Default value for STR2 fixes validation error
-    fsManage({ ACTION, STR, STR2 = "" }) {
+    fsManage({ ACTION, STR, STR2 = '' }) {
       switch (ACTION) {
-        case "create":
+        case 'create':
           this.start({ STR });
           break;
-        case "delete":
+        case 'delete':
           this.del({ STR });
           break;
-        case "set":
+        case 'set':
           this.setContent({ STR, STR2 });
           break;
-        case "copy":
+        case 'copy':
           this.copy({ STR, STR2 });
           break;
-        case "rename":
+        case 'rename':
           this.sync({ STR, STR2 });
           break;
         default:
@@ -482,26 +478,26 @@
     }
 
     fsClear({ TARGET }) {
-      if (TARGET === "trash") this.emptyTrash();
-      else if (TARGET === "ram") this.clearRamdisk();
+      if (TARGET === 'trash') this.emptyTrash();
+      else if (TARGET === 'ram') this.clearRamdisk();
       else this.clean();
     }
 
     fsCheck({ STR, CONDITION }) {
       const path = this._normalizePath(STR);
       switch (CONDITION) {
-        case "exists":
+        case 'exists':
           return this._exists(path);
-        case "file":
+        case 'file':
           return this._isFile(path);
-        case "directory":
+        case 'directory':
           return this._isDir(path);
-        case "read": {
+        case 'read': {
           const r = this.readActivity;
           this.readActivity = false;
           return r;
         }
-        case "written": {
+        case 'written': {
           const w = this.writeActivity;
           this.writeActivity = false;
           return w;
@@ -512,35 +508,35 @@
     }
 
     fsGet({ ATTRIBUTE, STR }) {
-      if (ATTRIBUTE === "lastRead") return this.lastReadPath;
-      if (ATTRIBUTE === "lastWrite") return this.lastWritePath;
-      if (ATTRIBUTE === "error") return this.lastError;
-      if (ATTRIBUTE === "version") return extensionVersion;
+      if (ATTRIBUTE === 'lastRead') return this.lastReadPath;
+      if (ATTRIBUTE === 'lastWrite') return this.lastWritePath;
+      if (ATTRIBUTE === 'error') return this.lastError;
+      if (ATTRIBUTE === 'version') return extensionVersion;
 
       const path = this._normalizePath(STR);
-      if (!path) return "";
+      if (!path) return '';
 
       switch (ATTRIBUTE) {
-        case "name":
+        case 'name':
           return this._fileName(path);
-        case "dir":
+        case 'dir':
           return this._dirName(path);
-        case "size":
+        case 'size':
           return this.getSize({ DIR: path });
-        case "limit":
+        case 'limit':
           return this.getLimit({ DIR: path });
-        case "hash":
+        case 'hash':
           return this.getHash({ PATH: path });
-        case "tree":
+        case 'tree':
           return this.getTree({ DIR: path });
-        case "created":
-          return this._getTimestamp(path, "created");
-        case "modified":
-          return this._getTimestamp(path, "modified");
-        case "accessed":
-          return this._getTimestamp(path, "accessed");
+        case 'created':
+          return this._getTimestamp(path, 'created');
+        case 'modified':
+          return this._getTimestamp(path, 'modified');
+        case 'accessed':
+          return this._getTimestamp(path, 'accessed');
         default:
-          return "";
+          return '';
       }
     }
 
@@ -560,7 +556,7 @@
     _triggerChange(path) {
       if (this.runtime) {
         this._eventTriggerPath = this._normalizePath(path);
-        this.runtime.startHats("rubyFS_whenFileChanged");
+        this.runtime.startHats('rubyFS_whenFileChanged');
         this._eventTriggerPath = null;
       }
     }
@@ -573,8 +569,9 @@
     }
 
     _getStore(path) {
-      if (path.startsWith("/RAM/"))
+      if (path.startsWith('/RAM/')) {
         return { fs: this.ramfs, index: this.ramIndex, isRam: true };
+      }
       return { fs: this.fs, index: this.childIndex, isRam: false };
     }
 
@@ -584,30 +581,32 @@
       const parentStore = this._getStore(parent);
 
       // Virtual entry for /RAM/ in Main Root index
-      if (parent === "/" && path === "/RAM/") {
-        if (!this.childIndex.has("/")) this.childIndex.set("/", new Set());
-        this.childIndex.get("/").add("/RAM/");
+      if (parent === '/' && path === '/RAM/') {
+        if (!this.childIndex.has('/')) this.childIndex.set('/', new Set());
+        this.childIndex.get('/').add('/RAM/');
         return;
       }
-      if (!parentStore.index.has(parent))
+      if (!parentStore.index.has(parent)) {
         parentStore.index.set(parent, new Set());
+      }
       parentStore.index.get(parent).add(path);
     }
 
     _removeFromIndex(path) {
       const parent = this._internalDirName(path);
       const parentStore = this._getStore(parent);
-      if (parent === "/" && path === "/RAM/") return;
-      if (parentStore.index.has(parent))
+      if (parent === '/' && path === '/RAM/') return;
+      if (parentStore.index.has(parent)) {
         parentStore.index.get(parent).delete(path);
+      }
       const store = this._getStore(path);
       if (store.index.has(path)) store.index.delete(path);
     }
 
     _ensureTrash() {
-      if (!this.fs.has("/.Trash/")) {
+      if (!this.fs.has('/.Trash/')) {
         const now = Date.now();
-        this.fs.set("/.Trash/", {
+        this.fs.set('/.Trash/', {
           content: null,
           perms: JSON.parse(JSON.stringify(defaultPerms)),
           limit: -1,
@@ -616,41 +615,40 @@
           modified: now,
           accessed: now,
         });
-        this._addToIndex("/.Trash/");
-        if (!this.childIndex.has("/.Trash/"))
-          this.childIndex.set("/.Trash/", new Set());
+        this._addToIndex('/.Trash/');
+        if (!this.childIndex.has('/.Trash/')) {
+          this.childIndex.set('/.Trash/', new Set());
+        }
       }
     }
 
     _normalizePath(path) {
-      if (typeof path !== "string" || !path.trim()) return null;
-      const hadTrailingSlash = path.length > 1 && path.endsWith("/");
-      if (path[0] !== "/") path = "/" + path;
-      const segments = path.split("/");
+      if (typeof path !== 'string' || !path.trim()) return null;
+      const hadTrailingSlash = path.length > 1 && path.endsWith('/');
+      if (path[0] !== '/') path = '/' + path;
+      const segments = path.split('/');
       const newSegments = [];
       for (const segment of segments) {
-        if (segment === "" || segment === ".") continue;
-        if (segment === "..") {
+        if (segment === '' || segment === '.') continue;
+        if (segment === '..') {
           if (newSegments.length > 0) newSegments.pop();
         } else newSegments.push(segment);
       }
-      let newPath = "/" + newSegments.join("/");
-      if (newPath === "/") return "/";
-      if (hadTrailingSlash) newPath += "/";
+      let newPath = '/' + newSegments.join('/');
+      if (newPath === '/') return '/';
+      if (hadTrailingSlash) newPath += '/';
       return newPath;
     }
 
     _isPathDir(path) {
-      return path === "/" || path.endsWith("/");
+      return path === '/' || path.endsWith('/');
     }
 
     _internalDirName(path) {
-      if (path === "/") return "/";
-      let procPath = this._isPathDir(path)
-        ? path.substring(0, path.length - 1)
-        : path;
-      const lastSlash = procPath.lastIndexOf("/");
-      if (lastSlash <= 0) return "/";
+      if (path === '/') return '/';
+      const procPath = this._isPathDir(path) ? path.substring(0, path.length - 1) : path;
+      const lastSlash = procPath.lastIndexOf('/');
+      if (lastSlash <= 0) return '/';
       return procPath.substring(0, lastSlash + 1);
     }
 
@@ -681,7 +679,7 @@
     _canAccommodateChange(filePath, deltaSize) {
       if (deltaSize <= 0) return true;
       let currentDir = this._internalDirName(filePath);
-      while (currentDir !== "/" && currentDir !== "/RAM/") {
+      while (currentDir !== '/' && currentDir !== '/RAM/') {
         const store = this._getStore(currentDir);
         const entry = store.fs.get(currentDir);
         if (entry && entry.limit !== -1) {
@@ -694,10 +692,10 @@
         currentDir = this._internalDirName(currentDir);
       }
       // Check root limit
-      const store = this._getStore("/");
-      const entry = store.fs.get("/");
+      const store = this._getStore('/');
+      const entry = store.fs.get('/');
       if (entry && entry.limit !== -1) {
-        const currentSize = this._getDirectorySize("/");
+        const currentSize = this._getDirectorySize('/');
         if (currentSize + deltaSize > entry.limit) {
           this._setError(`Size limit exceeded for /`);
           return false;
@@ -711,21 +709,21 @@
       if (store.fs.has(path)) return false;
       const parentStore = this._getStore(parentDir);
 
-      if (path === "/RAM/") return false; // System root
+      if (path === '/RAM/') return false; // System root
 
-      if (!this.hasPermission(parentDir, "create")) {
+      if (!this.hasPermission(parentDir, 'create')) {
         this._setError(`Create failed: No 'create' permission in ${parentDir}`);
         return false;
       }
       const deltaSize = this._getStringSize(content);
       if (!this._canAccommodateChange(path, deltaSize)) {
-        this._log("InternalCreate failed: Size limit exceeded");
+        this._log('InternalCreate failed: Size limit exceeded');
         return false;
       }
       let permsToInherit;
       const parentEntry = parentStore.fs.get(parentDir);
       if (parentEntry) permsToInherit = parentEntry.perms;
-      else if (parentDir === "/") permsToInherit = this.fs.get("/").perms;
+      else if (parentDir === '/') permsToInherit = this.fs.get('/').perms;
       else permsToInherit = defaultPerms;
 
       const now = Date.now();
@@ -751,14 +749,14 @@
       const store = this._getStore(normPath);
       const entry = store.fs.get(normPath);
       if (entry) return entry.perms[action];
-      if (action === "create") {
+      if (action === 'create') {
         const parentDir = this._internalDirName(normPath);
-        if (parentDir === "/") {
-          const root = this.fs.get("/");
+        if (parentDir === '/') {
+          const root = this.fs.get('/');
           return root ? root.perms.create : defaultPerms.create;
         }
-        if (parentDir === "/RAM/") {
-          const ramRoot = this.ramfs.get("/RAM/");
+        if (parentDir === '/RAM/') {
+          const ramRoot = this.ramfs.get('/RAM/');
           return ramRoot ? ramRoot.perms.create : defaultPerms.create;
         }
 
@@ -774,7 +772,7 @@
       const now = Date.now();
       this.fs.clear();
       this.childIndex.clear();
-      this.fs.set("/", {
+      this.fs.set('/', {
         content: null,
         perms: JSON.parse(JSON.stringify(defaultPerms)),
         limit: -1,
@@ -785,14 +783,14 @@
       });
       this.clearRamdisk();
       this.writeActivity = true;
-      this.lastWritePath = "/";
+      this.lastWritePath = '/';
     }
 
     clearRamdisk() {
       const now = Date.now();
       this.ramfs.clear();
       this.ramIndex.clear();
-      this.ramfs.set("/RAM/", {
+      this.ramfs.set('/RAM/', {
         content: null,
         perms: JSON.parse(JSON.stringify(defaultPerms)),
         limit: -1,
@@ -801,16 +799,17 @@
         modified: now,
         accessed: now,
       });
-      if (!this.childIndex.has("/")) this.childIndex.set("/", new Set());
-      this.childIndex.get("/").add("/RAM/");
+      if (!this.childIndex.has('/')) this.childIndex.set('/', new Set());
+      this.childIndex.get('/').add('/RAM/');
       this._ensureTrash();
       this.writeActivity = true;
     }
 
     clean() {
-      this.lastError = "";
-      if (!this.hasPermission("/", "delete"))
+      this.lastError = '';
+      if (!this.hasPermission('/', 'delete')) {
         return this._setError("Clean failed: No 'delete' permission on /");
+      }
       this._internalClean();
     }
 
@@ -840,87 +839,87 @@
     }
 
     _fileName(path) {
-      if (!path || path === "/") return "/";
+      if (!path || path === '/') return '/';
       const store = this._getStore(path);
       const entry = store.fs.get(path);
-      if (!entry || !entry.perms.see) return "";
+      if (!entry || !entry.perms.see) return '';
       if (this._isPathDir(path)) {
-        const parts = path.split("/").filter((p) => p);
-        return parts.length ? parts[parts.length - 1] : "";
+        const parts = path.split('/').filter((p) => p);
+        return parts.length ? parts[parts.length - 1] : '';
       }
-      return path.split("/").pop();
+      return path.split('/').pop();
     }
 
     _dirName(path) {
-      if (!path || path === "/") return "";
+      if (!path || path === '/') return '';
       const store = this._getStore(path);
       const entry = store.fs.get(path);
-      if (!entry || !entry.perms.see) return "";
+      if (!entry || !entry.perms.see) return '';
       return this._internalDirName(path);
     }
 
     // --- OPERATIONAL METHODS ---
 
     start({ STR }) {
-      this.lastError = "";
+      this.lastError = '';
       const path = this._normalizePath(STR);
-      if (!path) return this._setError("Invalid path provided.");
-      if (path === "/")
-        return this._setError("Create failed: Cannot create root");
+      if (!path) return this._setError('Invalid path provided.');
+      if (path === '/') {
+        return this._setError('Create failed: Cannot create root');
+      }
 
       const store = this._getStore(path);
-      if (store.fs.has(path))
-        return this._setError("Create failed: Path exists");
+      if (store.fs.has(path)) {
+        return this._setError('Create failed: Path exists');
+      }
 
       if (this._isPathDir(path)) {
-        if (store.fs.has(path.slice(0, -1)))
-          return this._setError("Create failed: File collision");
+        if (store.fs.has(path.slice(0, -1))) {
+          return this._setError('Create failed: File collision');
+        }
       } else {
-        if (store.fs.has(path + "/"))
-          return this._setError("Create failed: Directory collision");
+        if (store.fs.has(path + '/')) {
+          return this._setError('Create failed: Directory collision');
+        }
       }
 
       const parentDir = this._internalDirName(path);
       const parentStore = this._getStore(parentDir);
 
-      if (parentDir !== "/" && parentDir !== "/RAM/") {
+      if (parentDir !== '/' && parentDir !== '/RAM/') {
         const pEntry = parentStore.fs.get(parentDir);
-        if (pEntry && !pEntry.perms.see)
-          return this._setError("Create failed: Parent hidden");
+        if (pEntry && !pEntry.perms.see) {
+          return this._setError('Create failed: Parent hidden');
+        }
       }
 
-      if (
-        parentDir !== "/" &&
-        parentDir !== "/RAM/" &&
-        !parentStore.fs.has(parentDir)
-      ) {
-        if (!this.hasPermission(parentDir, "create"))
-          return this._setError("Create failed: No permission on parent");
+      if (parentDir !== '/' && parentDir !== '/RAM/' && !parentStore.fs.has(parentDir)) {
+        if (!this.hasPermission(parentDir, 'create')) {
+          return this._setError('Create failed: No permission on parent');
+        }
         this.start({ STR: parentDir });
         if (this.lastError) return;
       }
-      const ok = this._internalCreate(
-        path,
-        this._isPathDir(path) ? null : "",
-        parentDir
-      );
-      if (!ok && !this.lastError)
-        this._setError("Create failed: Internal error");
+      const ok = this._internalCreate(path, this._isPathDir(path) ? null : '', parentDir);
+      if (!ok && !this.lastError) {
+        this._setError('Create failed: Internal error');
+      }
     }
 
     open({ STR }) {
-      this.lastError = "";
+      this.lastError = '';
       const path = this._normalizePath(STR);
-      if (!path) return this._setError("Invalid path");
+      if (!path) return this._setError('Invalid path');
 
       const store = this._getStore(path);
       const entry = store.fs.get(path);
 
-      if (!entry) return this._setError("Open failed: Not found");
-      if (!entry.perms.see) return this._setError("Open failed: Hidden");
-      if (this._isPathDir(path))
-        return this._setError("Open failed: Is directory");
-      if (!entry.perms.read) return this._setError("Open failed: Read denied");
+      if (!entry) return this._setError('Open failed: Not found');
+      if (!entry.perms.see) return this._setError('Open failed: Hidden');
+      if (this._isPathDir(path)) {
+        return this._setError('Open failed: Is directory');
+      }
+      if (!entry.perms.read) return this._setError('Open failed: Read denied');
       this.readActivity = true;
       this.lastReadPath = path;
       entry.accessed = Date.now();
@@ -928,17 +927,19 @@
     }
 
     del({ STR }) {
-      this.lastError = "";
+      this.lastError = '';
       const path = this._normalizePath(STR);
-      if (!path) return this._setError("Invalid path");
-      if (path === "/" || path === "/RAM/")
-        return this._setError("Delete failed: Cannot delete root/mount");
-      if (!this.hasPermission(path, "delete"))
-        return this._setError("Delete failed: Denied");
+      if (!path) return this._setError('Invalid path');
+      if (path === '/' || path === '/RAM/') {
+        return this._setError('Delete failed: Cannot delete root/mount');
+      }
+      if (!this.hasPermission(path, 'delete')) {
+        return this._setError('Delete failed: Denied');
+      }
 
       const store = this._getStore(path);
 
-      if (path.startsWith("/.Trash/")) {
+      if (path.startsWith('/.Trash/')) {
         // Permanent
         const toDelete = [];
         const stack = [];
@@ -962,9 +963,9 @@
       } else {
         // Move to Trash
         this._ensureTrash();
-        const name = path.endsWith("/")
-          ? path.split("/").slice(-2, -1)[0] + "/"
-          : path.split("/").pop();
+        const name = path.endsWith('/')
+          ? path.split('/').slice(-2, -1)[0] + '/'
+          : path.split('/').pop();
         const trashPath = `/.Trash/${Date.now()}_${name}`;
 
         this.copy({ STR: path, STR2: trashPath }); // Cross-FS aware copy
@@ -997,8 +998,8 @@
     }
 
     emptyTrash() {
-      this.lastError = "";
-      const trashPath = "/.Trash/";
+      this.lastError = '';
+      const trashPath = '/.Trash/';
       if (!this.fs.has(trashPath)) return;
 
       const toDelete = [];
@@ -1024,9 +1025,9 @@
 
     // Renamed from 'folder' to 'setContent'
     setContent({ STR, STR2 }) {
-      this.lastError = "";
+      this.lastError = '';
       const path = this._normalizePath(STR);
-      if (!path) return this._setError("Invalid path");
+      if (!path) return this._setError('Invalid path');
 
       const store = this._getStore(path);
       let entry = store.fs.get(path);
@@ -1035,12 +1036,12 @@
         entry = store.fs.get(path);
         if (!entry) return;
       }
-      if (this._isPathDir(path))
-        return this._setError("Set failed: Is directory");
-      if (!entry.perms.write) return this._setError("Set failed: Write denied");
+      if (this._isPathDir(path)) {
+        return this._setError('Set failed: Is directory');
+      }
+      if (!entry.perms.write) return this._setError('Set failed: Write denied');
 
-      const deltaSize =
-        this._getStringSize(STR2) - this._getStringSize(entry.content || "");
+      const deltaSize = this._getStringSize(STR2) - this._getStringSize(entry.content || '');
       if (!this._canAccommodateChange(path, deltaSize)) return;
 
       entry.content = STR2;
@@ -1053,20 +1054,20 @@
 
     // RESTORED 'list' method
     list({ TYPE, STR }) {
-      this.lastError = "";
+      this.lastError = '';
       let path = this._normalizePath(STR);
-      if (!path) return "[]";
-      if (!this._isPathDir(path)) path += "/";
+      if (!path) return '[]';
+      if (!this._isPathDir(path)) path += '/';
 
       const store = this._getStore(path);
       const entry = store.fs.get(path);
       if (!entry) {
-        this._setError("List failed: Directory not found");
-        return "[]";
+        this._setError('List failed: Directory not found');
+        return '[]';
       }
       if (!entry.perms.see) {
-        this._setError("List failed: Directory hidden");
-        return "[]";
+        this._setError('List failed: Directory hidden');
+        return '[]';
       }
 
       this.readActivity = true;
@@ -1081,11 +1082,12 @@
           if (!childEntry || !childEntry.perms.see) continue;
 
           const childName = childPath.substring(path.length);
-          if (TYPE === "all") results.push(childName);
-          else if (TYPE === "files" && !this._isPathDir(childPath))
+          if (TYPE === 'all') results.push(childName);
+          else if (TYPE === 'files' && !this._isPathDir(childPath)) {
             results.push(childName);
-          else if (TYPE === "directories" && this._isPathDir(childPath))
+          } else if (TYPE === 'directories' && this._isPathDir(childPath)) {
             results.push(childName);
+          }
         }
       }
       results.sort();
@@ -1093,12 +1095,13 @@
     }
 
     sync({ STR, STR2 }) {
-      this.lastError = "";
+      this.lastError = '';
       const path1 = this._normalizePath(STR);
       const path2 = this._normalizePath(STR2);
-      if (!path1 || !path2) return this._setError("Invalid path provided.");
-      if (path1 === "/" || path1 === "/RAM/")
-        return this._setError("Rename failed: Root/Mount cannot be renamed");
+      if (!path1 || !path2) return this._setError('Invalid path provided.');
+      if (path1 === '/' || path1 === '/RAM/') {
+        return this._setError('Rename failed: Root/Mount cannot be renamed');
+      }
 
       const store1 = this._getStore(path1);
       const store2 = this._getStore(path2);
@@ -1111,24 +1114,29 @@
         return;
       }
 
-      if (!this.hasPermission(path1, "delete"))
+      if (!this.hasPermission(path1, 'delete')) {
         return this._setError("Rename failed: No 'delete' permission");
-      if (store2.fs.has(path2))
-        return this._setError("Rename failed: Destination exists");
-
-      if (this._isPathDir(path2)) {
-        if (store2.fs.has(path2.slice(0, -1)))
-          return this._setError("Rename failed: File collision");
-      } else {
-        if (store2.fs.has(path2 + "/"))
-          return this._setError("Rename failed: Directory collision");
+      }
+      if (store2.fs.has(path2)) {
+        return this._setError('Rename failed: Destination exists');
       }
 
-      if (!this.hasPermission(path2, "create"))
+      if (this._isPathDir(path2)) {
+        if (store2.fs.has(path2.slice(0, -1))) {
+          return this._setError('Rename failed: File collision');
+        }
+      } else {
+        if (store2.fs.has(path2 + '/')) {
+          return this._setError('Rename failed: Directory collision');
+        }
+      }
+
+      if (!this.hasPermission(path2, 'create')) {
         return this._setError("Rename failed: No 'create' permission");
+      }
 
       const entry = store1.fs.get(path1);
-      if (!entry) return this._setError("Rename failed: Source not found");
+      if (!entry) return this._setError('Rename failed: Source not found');
 
       const isDir = this._isPathDir(path1);
       let deltaSize = 0;
@@ -1179,22 +1187,25 @@
     }
 
     copy({ STR, STR2 }) {
-      this.lastError = "";
+      this.lastError = '';
       const path1 = this._normalizePath(STR);
       const path2 = this._normalizePath(STR2);
-      if (!path1 || !path2) return this._setError("Invalid path provided.");
+      if (!path1 || !path2) return this._setError('Invalid path provided.');
 
       const store1 = this._getStore(path1);
       const store2 = this._getStore(path2);
 
       const entry = store1.fs.get(path1);
-      if (!entry) return this._setError("Copy failed: Source not found");
-      if (!entry.perms.read)
+      if (!entry) return this._setError('Copy failed: Source not found');
+      if (!entry.perms.read) {
         return this._setError("Copy failed: No 'read' permission");
-      if (store2.fs.has(path2))
-        return this._setError("Copy failed: Destination exists");
-      if (!this.hasPermission(path2, "create"))
+      }
+      if (store2.fs.has(path2)) {
+        return this._setError('Copy failed: Destination exists');
+      }
+      if (!this.hasPermission(path2, 'create')) {
         return this._setError("Copy failed: No 'create' permission");
+      }
 
       this.readActivity = true;
       this.lastReadPath = path1;
@@ -1232,11 +1243,10 @@
 
       const path1Length = path1.length;
       for (const item of toCopy) {
-        const remainder =
-          item.key === path1 ? "" : item.key.substring(path1Length);
+        const remainder = item.key === path1 ? '' : item.key.substring(path1Length);
         const newPath = path2 + remainder;
         store2.fs.set(newPath, {
-          content: item.value.content === null ? null : "" + item.value.content,
+          content: item.value.content === null ? null : '' + item.value.content,
           perms: JSON.parse(JSON.stringify(item.value.perms)),
           limit: item.value.limit,
           tags: JSON.parse(JSON.stringify(item.value.tags || {})),
@@ -1254,7 +1264,7 @@
     _getTimestamp(path, type) {
       const store = this._getStore(path);
       const entry = store.fs.get(path);
-      if (!entry || !entry.perms.see) return "";
+      if (!entry || !entry.perms.see) return '';
       this.readActivity = true;
       this.lastReadPath = path;
       entry.accessed = Date.now();
@@ -1262,40 +1272,42 @@
     }
 
     toggleLogging({ STATE }) {
-      this.RubyFSLogEnabled = STATE === "on";
+      this.RubyFSLogEnabled = STATE === 'on';
     }
     getVersion() {
       return extensionVersion;
     }
 
     setLimit({ DIR, BYTES }) {
-      this.lastError = "";
-      let path = this._normalizePath(DIR);
-      if (!path || path === "/" || !this._isPathDir(path))
-        return this._setError("Invalid path");
-      if (!this.hasPermission(path, "control")) return this._setError("Denied");
+      this.lastError = '';
+      const path = this._normalizePath(DIR);
+      if (!path || path === '/' || !this._isPathDir(path)) {
+        return this._setError('Invalid path');
+      }
+      if (!this.hasPermission(path, 'control')) return this._setError('Denied');
       const store = this._getStore(path);
       const entry = store.fs.get(path);
-      if (!entry) return this._setError("Not found");
+      if (!entry) return this._setError('Not found');
       entry.limit = Math.max(-1, parseFloat(BYTES) || 0);
       this.writeActivity = true;
     }
     removeLimit({ DIR }) {
-      this.lastError = "";
-      let path = this._normalizePath(DIR);
-      if (!path || path === "/" || !this._isPathDir(path))
-        return this._setError("Invalid path");
-      if (!this.hasPermission(path, "control")) return this._setError("Denied");
+      this.lastError = '';
+      const path = this._normalizePath(DIR);
+      if (!path || path === '/' || !this._isPathDir(path)) {
+        return this._setError('Invalid path');
+      }
+      if (!this.hasPermission(path, 'control')) return this._setError('Denied');
       const store = this._getStore(path);
       const entry = store.fs.get(path);
-      if (!entry) return this._setError("Not found");
+      if (!entry) return this._setError('Not found');
       entry.limit = -1;
       this.writeActivity = true;
     }
     getLimit({ DIR }) {
       let path = this._normalizePath(DIR);
       if (!path) return -1;
-      if (!this._isPathDir(path)) path += "/";
+      if (!this._isPathDir(path)) path += '/';
       const store = this._getStore(path);
       const entry = store.fs.get(path);
       if (!entry || !entry.perms.see) return -1;
@@ -1304,33 +1316,34 @@
     getSize({ DIR }) {
       let path = this._normalizePath(DIR);
       if (!path) return 0;
-      if (!this._isPathDir(path)) path += "/";
+      if (!this._isPathDir(path)) path += '/';
       const store = this._getStore(path);
       const entry = store.fs.get(path);
       if (!entry || !entry.perms.see) return 0;
       return this._getDirectorySize(path);
     }
     setPerm({ ACTION, PERM, STR }) {
-      this.lastError = "";
+      this.lastError = '';
       const path = this._normalizePath(STR);
-      if (!path || path === "/") return this._setError("Invalid");
-      if (!this.hasPermission(path, "control")) return this._setError("Denied");
-      const val = ACTION === "add";
+      if (!path || path === '/') return this._setError('Invalid');
+      if (!this.hasPermission(path, 'control')) return this._setError('Denied');
+      const val = ACTION === 'add';
       const isDir = this._isPathDir(path);
-      const prefix = path.endsWith("/") ? path : path + "/";
+      const prefix = path.endsWith('/') ? path : path + '/';
       const store = this._getStore(path);
       for (const [p, e] of store.fs.entries()) {
-        if ((isDir && (p === path || p.startsWith(prefix))) || p === path)
+        if ((isDir && (p === path || p.startsWith(prefix))) || p === path) {
           e.perms[PERM] = val;
+        }
       }
       this.writeActivity = true;
     }
     listPerms({ STR }) {
       const path = this._normalizePath(STR);
-      if (!path) return "{}";
+      if (!path) return '{}';
       const store = this._getStore(path);
       const e = store.fs.get(path);
-      if (!e || !e.perms.see) return "{}";
+      if (!e || !e.perms.see) return '{}';
       return JSON.stringify(e.perms);
     }
 
@@ -1347,7 +1360,7 @@
           );
         } catch (e2) {
           this._setError(`Base64 Error: ${e2.message}`);
-          return "";
+          return '';
         }
       }
     }
@@ -1355,37 +1368,37 @@
       try {
         return decodeURIComponent(
           atob(base64)
-            .split("")
-            .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-            .join("")
+            .split('')
+            .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+            .join('')
         );
       } catch (e) {
         return atob(base64);
       }
     }
     _getMimeType(path) {
-      const ext = path.split(".").pop().toLowerCase();
+      const ext = path.split('.').pop().toLowerCase();
       const mimes = {
-        txt: "text/plain",
-        json: "application/json",
-        svg: "image/svg+xml",
-        png: "image/png",
-        jpg: "image/jpeg",
-        jpeg: "image/jpeg",
-        gif: "image/gif",
-        zip: "application/zip",
-        sprite3: "application/x-zip-compressed",
-        sb3: "application/x-zip-compressed",
-        wav: "audio/wav",
-        mp3: "audio/mpeg",
+        txt: 'text/plain',
+        json: 'application/json',
+        svg: 'image/svg+xml',
+        png: 'image/png',
+        jpg: 'image/jpeg',
+        jpeg: 'image/jpeg',
+        gif: 'image/gif',
+        zip: 'application/zip',
+        sprite3: 'application/x-zip-compressed',
+        sb3: 'application/x-zip-compressed',
+        wav: 'audio/wav',
+        mp3: 'audio/mpeg',
       };
-      return mimes[ext] || "application/octet-stream";
+      return mimes[ext] || 'application/octet-stream';
     }
 
     out() {
-      this.lastError = "";
+      this.lastError = '';
       this.readActivity = true;
-      this.lastReadPath = "/";
+      this.lastReadPath = '/';
       const fsObject = {};
       for (const [path, entry] of this.fs.entries()) {
         fsObject[path] = JSON.parse(JSON.stringify(entry));
@@ -1394,14 +1407,15 @@
     }
 
     in({ STR }) {
-      this.lastError = "";
-      if (!this.hasPermission("/", "delete"))
-        return this._setError("Import denied");
+      this.lastError = '';
+      if (!this.hasPermission('/', 'delete')) {
+        return this._setError('Import denied');
+      }
       let data;
       try {
         data = JSON.parse(STR);
       } catch (e) {
-        return this._setError("JSON Error");
+        return this._setError('JSON Error');
       }
 
       const tempFS = new Map();
@@ -1413,8 +1427,8 @@
       };
 
       // Virtual /RAM/ in main index
-      if (!tempIndex.has("/")) tempIndex.set("/", new Set());
-      tempIndex.get("/").add("/RAM/");
+      if (!tempIndex.has('/')) tempIndex.set('/', new Set());
+      tempIndex.get('/').add('/RAM/');
 
       try {
         // const version = data.version || ""; // REMOVED unused var
@@ -1424,19 +1438,19 @@
           /* Migration skipped */
         }
 
-        if (!oldData["/"]) return this._setError("Missing root");
-        oldData["/"].perms = JSON.parse(JSON.stringify(defaultPerms));
-        oldData["/"].limit = -1;
+        if (!oldData['/']) return this._setError('Missing root');
+        oldData['/'].perms = JSON.parse(JSON.stringify(defaultPerms));
+        oldData['/'].limit = -1;
 
         for (const path in oldData) {
           if (Object.prototype.hasOwnProperty.call(oldData, path)) {
-            if (path.startsWith("/RAM/")) continue; // Skip RAM in imports
+            if (path.startsWith('/RAM/')) continue; // Skip RAM in imports
             const entry = oldData[path];
             if (!entry.tags) entry.tags = {}; // Ensure tags exist
             const fixedPath = this._normalizePath(path);
             tempFS.set(fixedPath, JSON.parse(JSON.stringify(entry)));
             // FIX: Do not add root to the index to avoid infinite recursion
-            if (fixedPath !== "/") {
+            if (fixedPath !== '/') {
               addToTempIndex(fixedPath);
             }
           }
@@ -1446,47 +1460,45 @@
         this._ensureTrash();
         this.clearRamdisk();
         this.writeActivity = true;
-        this.lastWritePath = "/";
+        this.lastWritePath = '/';
       } catch (e) {
-        this._setError("Import error: " + e.message);
+        this._setError('Import error: ' + e.message);
       }
     }
 
     exportFileBase64({ STR, FORMAT }) {
-      this.lastError = "";
+      this.lastError = '';
       const path = this._normalizePath(STR);
-      if (!path) return "";
+      if (!path) return '';
 
       const store = this._getStore(path);
       const entry = store.fs.get(path);
-      if (!entry) return this._setError("Export failed: Not found");
-      if (this._isPathDir(path)) return this._setError("Export failed: Is dir");
-      if (!entry.perms.see || !entry.perms.read)
-        return this._setError("Export failed: Denied");
+      if (!entry) return this._setError('Export failed: Not found');
+      if (this._isPathDir(path)) return this._setError('Export failed: Is dir');
+      if (!entry.perms.see || !entry.perms.read) {
+        return this._setError('Export failed: Denied');
+      }
 
       this.readActivity = true;
       this.lastReadPath = path;
       entry.accessed = Date.now();
       const b64 = this._encodeUTF8Base64(String(entry.content));
-      if (FORMAT === "data_url")
+      if (FORMAT === 'data_url') {
         return `data:${this._getMimeType(path)};base64,${b64}`;
+      }
       return b64;
     }
 
     importFileBase64({ STR, STR2 }) {
-      this.lastError = "";
+      this.lastError = '';
       const path = this._normalizePath(STR2);
-      if (!path || this._isPathDir(path)) return this._setError("Invalid path");
-      if (!STR || !STR.trim()) return this._setError("Empty input");
-      let base64String =
-        STR.replace(/\s+/g, "").match(/^data:.*?,(.*)$/)?.[1] ||
-        STR.replace(/\s+/g, "");
-      if (
-        !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(
-          base64String
-        )
-      )
-        return this._setError("Invalid Base64");
+      if (!path || this._isPathDir(path)) return this._setError('Invalid path');
+      if (!STR || !STR.trim()) return this._setError('Empty input');
+      const base64String =
+        STR.replace(/\s+/g, '').match(/^data:.*?,(.*)$/)?.[1] || STR.replace(/\s+/g, '');
+      if (!/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(base64String)) {
+        return this._setError('Invalid Base64');
+      }
       const decoded = this._decodeUTF8Base64(base64String);
       this.setContent({ STR: path, STR2: decoded }); // Updated call
       if (!this.lastError) this.lastWritePath = path;
@@ -1494,13 +1506,13 @@
 
     // --- Tags ---
     setTag({ KEY, VALUE, PATH }) {
-      this.lastError = "";
+      this.lastError = '';
       const path = this._normalizePath(PATH);
-      if (!path) return this._setError("Invalid path");
+      if (!path) return this._setError('Invalid path');
       const store = this._getStore(path);
       const entry = store.fs.get(path);
-      if (!entry) return this._setError("Path not found");
-      if (!entry.perms.write) return this._setError("Write denied");
+      if (!entry) return this._setError('Path not found');
+      if (!entry.perms.write) return this._setError('Write denied');
       entry.tags[KEY] = VALUE;
       entry.modified = Date.now();
       this.writeActivity = true;
@@ -1508,23 +1520,23 @@
     }
 
     getTag({ KEY, PATH }) {
-      this.lastError = "";
+      this.lastError = '';
       const path = this._normalizePath(PATH);
-      if (!path) return "";
+      if (!path) return '';
       const store = this._getStore(path);
       const entry = store.fs.get(path);
-      if (!entry || !entry.perms.see) return "";
-      return entry.tags[KEY] || "";
+      if (!entry || !entry.perms.see) return '';
+      return entry.tags[KEY] || '';
     }
 
     deleteTag({ KEY, PATH }) {
-      this.lastError = "";
+      this.lastError = '';
       const path = this._normalizePath(PATH);
-      if (!path) return this._setError("Invalid path");
+      if (!path) return this._setError('Invalid path');
       const store = this._getStore(path);
       const entry = store.fs.get(path);
-      if (!entry) return this._setError("Path not found");
-      if (!entry.perms.write) return this._setError("Write denied");
+      if (!entry) return this._setError('Path not found');
+      if (!entry.perms.write) return this._setError('Write denied');
       delete entry.tags[KEY];
       entry.modified = Date.now();
       this.writeActivity = true;
@@ -1534,27 +1546,27 @@
     // --- New Features (Glob, Hash, Tree) ---
 
     listGlob({ TYPE, PATTERN, DIR }) {
-      this.lastError = "";
+      this.lastError = '';
       let path = this._normalizePath(DIR);
-      if (!path) return "[]";
-      if (!this._isPathDir(path)) path += "/";
+      if (!path) return '[]';
+      if (!this._isPathDir(path)) path += '/';
       const store = this._getStore(path);
       const entry = store.fs.get(path);
-      if (!entry || !entry.perms.see) return "[]";
+      if (!entry || !entry.perms.see) return '[]';
       this.readActivity = true;
       this.lastReadPath = path;
 
       const childrenSet = store.index.get(path);
       const results = [];
       // Regex conversion
-      const regexBody = PATTERN.split("")
+      const regexBody = PATTERN.split('')
         .map((c) => {
-          if (c === "*") return ".*";
-          if (c === "?") return ".";
-          if (/[.+^${}()|[\]\\]/.test(c)) return "\\" + c;
+          if (c === '*') return '.*';
+          if (c === '?') return '.';
+          if (/[.+^${}()|[\]\\]/.test(c)) return '\\' + c;
           return c;
         })
-        .join("");
+        .join('');
       const regex = new RegExp(`^${regexBody}$`);
 
       if (childrenSet) {
@@ -1563,11 +1575,12 @@
           if (!childEntry || !childEntry.perms.see) continue;
           const childName = childPath.substring(path.length);
           if (regex.test(childName)) {
-            if (TYPE === "all") results.push(childName);
-            else if (TYPE === "files" && !this._isPathDir(childPath))
+            if (TYPE === 'all') results.push(childName);
+            else if (TYPE === 'files' && !this._isPathDir(childPath)) {
               results.push(childName);
-            else if (TYPE === "directories" && this._isPathDir(childPath))
+            } else if (TYPE === 'directories' && this._isPathDir(childPath)) {
               results.push(childName);
+            }
           }
         }
       }
@@ -1577,7 +1590,7 @@
 
     getHash({ PATH }) {
       const content = this.open({ STR: PATH });
-      if (typeof content !== "string" || content === "") return "0";
+      if (typeof content !== 'string' || content === '') return '0';
       let hash = 0x811c9dc5;
       for (let i = 0; i < content.length; i++) {
         hash ^= content.charCodeAt(i);
@@ -1588,12 +1601,12 @@
 
     getTree({ DIR }) {
       let path = this._normalizePath(DIR);
-      if (!this._isPathDir(path)) path += "/";
+      if (!this._isPathDir(path)) path += '/';
       const store = this._getStore(path);
       const rootEntry = store.fs.get(path);
-      if (!rootEntry || !rootEntry.perms.see) return "Path not found";
+      if (!rootEntry || !rootEntry.perms.see) return 'Path not found';
 
-      let output = path + "\n";
+      let output = path + '\n';
       const treeStack = [];
       const rootChildren = Array.from(store.index.get(path) || [])
         .filter((p) => {
@@ -1605,7 +1618,7 @@
       for (let i = rootChildren.length - 1; i >= 0; i--) {
         treeStack.push({
           path: rootChildren[i],
-          prefix: "",
+          prefix: '',
           isLast: i === rootChildren.length - 1,
         });
       }
@@ -1614,8 +1627,8 @@
         const { path: currentPath, prefix, isLast } = treeStack.pop();
         const name = currentPath
           .substring(this._internalDirName(currentPath).length)
-          .replace("/", "");
-        output += prefix + (isLast ? "└── " : "├── ") + name + "\n";
+          .replace('/', '');
+        output += prefix + (isLast ? '└── ' : '├── ') + name + '\n';
         if (this._isPathDir(currentPath)) {
           const children = Array.from(store.index.get(currentPath) || [])
             .filter((p) => {
@@ -1623,7 +1636,7 @@
               return e && e.perms.see;
             })
             .sort();
-          const newPrefix = prefix + (isLast ? "    " : "│   ");
+          const newPrefix = prefix + (isLast ? '    ' : '│   ');
           for (let i = children.length - 1; i >= 0; i--) {
             treeStack.push({
               path: children[i],
@@ -1648,46 +1661,50 @@
       this._internalClean();
 
       try {
-        this.fsManage({ ACTION: "create", STR: "/a.txt", STR2: "" });
-        if (!this.fsCheck({ STR: "/a.txt", CONDITION: "exists" }))
-          throw new Error("Create failed");
-        this.fsManage({ ACTION: "delete", STR: "/a.txt", STR2: "" });
-        if (this.fsCheck({ STR: "/a.txt", CONDITION: "exists" }))
-          throw new Error("Delete failed");
+        this.fsManage({ ACTION: 'create', STR: '/a.txt', STR2: '' });
+        if (!this.fsCheck({ STR: '/a.txt', CONDITION: 'exists' })) {
+          throw new Error('Create failed');
+        }
+        this.fsManage({ ACTION: 'delete', STR: '/a.txt', STR2: '' });
+        if (this.fsCheck({ STR: '/a.txt', CONDITION: 'exists' })) {
+          throw new Error('Delete failed');
+        }
 
         // Check Last Error before assuming undefined trash
-        if (this.lastError)
-          throw new Error("Manage op failed: " + this.lastError);
+        if (this.lastError) {
+          throw new Error('Manage op failed: ' + this.lastError);
+        }
 
-        const trash = this.childIndex.get("/.Trash/");
-        if (!trash || !trash.size) throw new Error("Trash failed");
-        this.fsClear({ TARGET: "trash" });
-        const empty = this.childIndex.get("/.Trash/");
-        if (empty && empty.size) throw new Error("Empty failed");
+        const trash = this.childIndex.get('/.Trash/');
+        if (!trash || !trash.size) throw new Error('Trash failed');
+        this.fsClear({ TARGET: 'trash' });
+        const empty = this.childIndex.get('/.Trash/');
+        if (empty && empty.size) throw new Error('Empty failed');
 
         // New Feature Tests
-        this.fsManage({ ACTION: "create", STR: "/RAM/temp.txt", STR2: "" });
-        if (!this.ramfs.has("/RAM/temp.txt")) throw new Error("RamDisk failed");
+        this.fsManage({ ACTION: 'create', STR: '/RAM/temp.txt', STR2: '' });
+        if (!this.ramfs.has('/RAM/temp.txt')) throw new Error('RamDisk failed');
 
-        this.setTag({ KEY: "foo", VALUE: "bar", PATH: "/RAM/temp.txt" });
-        if (this.getTag({ KEY: "foo", PATH: "/RAM/temp.txt" }) !== "bar")
-          throw new Error("Tag failed");
+        this.setTag({ KEY: 'foo', VALUE: 'bar', PATH: '/RAM/temp.txt' });
+        if (this.getTag({ KEY: 'foo', PATH: '/RAM/temp.txt' }) !== 'bar') {
+          throw new Error('Tag failed');
+        }
 
         // List check
-        const listResult = JSON.parse(this.list({ TYPE: "all", STR: "/RAM/" }));
-        if (!listResult.includes("temp.txt")) throw new Error("List failed");
+        const listResult = JSON.parse(this.list({ TYPE: 'all', STR: '/RAM/' }));
+        if (!listResult.includes('temp.txt')) throw new Error('List failed');
       } catch (e) {
         this.fs = oldFS;
         this.childIndex = oldIndex;
         this.ramfs = oldRamFS;
         this.ramIndex = oldRamIndex;
-        return "FAIL: " + e.message;
+        return 'FAIL: ' + e.message;
       }
       this.fs = oldFS;
       this.childIndex = oldIndex;
       this.ramfs = oldRamFS;
       this.ramIndex = oldRamIndex;
-      return "PASS";
+      return 'PASS';
     }
   }
 

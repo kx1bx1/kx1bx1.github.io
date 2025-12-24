@@ -2,14 +2,13 @@
   "name": "kx1bx1-extension-gallery",
   "version": "1.0.0",
   "description": "A gallery of custom extensions for TurboWarp developed by kx1bx1.",
-  "main": "./src/index.html",
+  "type": "module",
+  "private": true,
   "scripts": {
     "start": "npx serve ./src/",
-    "lint": "eslint ./src/script.js",
-    "lint:fix": "eslint ./src/script.js --fix",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
     "format": "prettier --write .",
-    "predeploy": "npm run lint && npm run format",
-    "deploy": "gh-pages -d ./src/",
     "format:check": "prettier --check ."
   },
   "keywords": [
@@ -21,37 +20,7 @@
   "license": "GPL-3.0",
   "devDependencies": {
     "eslint": "^8.57.0",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-html": "^8.1.1",
-    "gh-pages": "^6.1.1",
     "globals": "^16.5.0",
     "prettier": "^3.2.5"
-  },
-  "eslintConfig": {
-    "env": {
-      "browser": true,
-      "es2021": true
-    },
-    "extends": [
-      "eslint:recommended",
-      "prettier"
-    ],
-    "plugins": [
-      "html"
-    ],
-    "parserOptions": {
-      "ecmaVersion": "latest",
-      "sourceType": "script"
-    },
-    "rules": {
-      "no-unused-vars": "warn",
-      "no-console": "off"
-    }
-  },
-  "prettier": {
-    "semi": true,
-    "singleQuote": false,
-    "tabWidth": 2,
-    "trailingComma": "es5"
   }
 }

@@ -3,7 +3,7 @@ name: Dependency audits
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 12 * * 1" # weekly
+    - cron: '0 12 * * 1' # weekly
 
 jobs:
   audit:
