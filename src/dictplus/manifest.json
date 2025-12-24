@@ -1,0 +1,10 @@
+{
+  "name": "Dictionaries+",
+  "description": "Bring structured data to your Scratch projects. An advancement of the Dictionaries extension.",
+  "author": "kx1bx1",
+  "version": "1.0.0",
+  "category": "data",
+  "unsandboxed": false,
+  "entry": "extension.js",
+  "fork": true
+}
