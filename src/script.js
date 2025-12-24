@@ -578,7 +578,9 @@ const App = (() => {
     lastFocusedElement = document.activeElement;
     try {
       history.pushState(null, null, `#${id}`);
-    } catch (e) {}
+    } catch (e) {
+      // History API may not be available in some environments
+    }
 
     els.modalTitle.textContent = ext.name;
     els.modalAuthor.textContent = ext.author;
@@ -659,7 +661,9 @@ const App = (() => {
         null,
         window.location.pathname + window.location.search
       );
-    } catch (e) {}
+    } catch (e) {
+      // History API may not be available in some environments
+    }
     els.modal.classList.remove("open");
     setTimeout(() => {
       els.modal.classList.add("hidden");
