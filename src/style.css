@@ -45,11 +45,11 @@ body {
 }
 .dark .extension-card:hover {
   box-shadow: 0 10px 30px -10px rgba(255, 76, 76, 0.15);
-  border-color: #ff4c4c;
+  border-color: #c64cff;
 }
 .extension-card:hover {
   box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
-  border-color: #ff4c4c;
+  border-color: #c64cff;
 }
 
 /* Line Clamp & Firefox Support */
